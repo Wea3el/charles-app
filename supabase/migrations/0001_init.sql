@@ -283,18 +283,26 @@ create index on order_lines (order_id);
 -- ---------------------------------------------------------------------------
 create or replace function is_staff() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists (select 1 from staff where id = auth.uid() and active);
+  select exists (select 1 from staff where id = (select auth.uid()) and active);
+$$;
+
+create or replace function is_manager() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from staff where id = (select auth.uid()) and active and role = 'manager');
 $$;
 
 create or replace function is_price_editor() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists (select 1 from staff where id = auth.uid() and active and can_edit_prices);
+  select exists (select 1 from staff where id = (select auth.uid()) and active and can_edit_prices);
 $$;
 
 create or replace function my_customer_id() returns uuid
 language sql stable security definer set search_path = public as $$
-  select id from customers where auth_user_id = auth.uid();
+  select id from customers where auth_user_id = (select auth.uid());
 $$;
+
+revoke execute on function is_staff(), is_manager(), is_price_editor(), my_customer_id() from public, anon;
+grant execute on function is_staff(), is_manager(), is_price_editor(), my_customer_id() to authenticated;
 
 alter table staff              enable row level security;
 alter table customers          enable row level security;
@@ -314,58 +322,86 @@ alter table order_lines        enable row level security;
 alter table payments           enable row level security;
 alter table settings           enable row level security;
 
--- Staff can do everything, except price edits which need can_edit_prices.
-create policy staff_all on staff              for all using (is_staff()) with check (is_staff());
-create policy staff_all on customers          for all using (is_staff()) with check (is_staff());
-create policy staff_all on customer_documents for all using (is_staff()) with check (is_staff());
-create policy staff_read on products          for select using (is_staff());
-create policy price_edit on products          for all using (is_price_editor()) with check (is_price_editor());
-create policy staff_read on pack_sizes        for select using (is_staff());
-create policy price_edit on pack_sizes        for all using (is_price_editor()) with check (is_price_editor());
-create policy staff_all on product_barcodes   for all using (is_staff()) with check (is_staff());
-create policy staff_all on locations          for all using (is_staff()) with check (is_staff());
-create policy staff_all on stock              for all using (is_staff()) with check (is_staff());
-create policy staff_all on stock_movements    for all using (is_staff()) with check (is_staff());
-create policy staff_all on stock_thresholds   for all using (is_staff()) with check (is_staff());
-create policy staff_all on sales              for all using (is_staff()) with check (is_staff());
-create policy staff_all on sale_lines         for all using (is_staff()) with check (is_staff());
-create policy staff_all on delivery_trips     for all using (is_staff()) with check (is_staff());
-create policy staff_all on orders             for all using (is_staff()) with check (is_staff());
-create policy staff_all on order_lines        for all using (is_staff()) with check (is_staff());
-create policy staff_all on payments           for all using (is_staff()) with check (is_staff());
-create policy staff_read on settings          for select using (is_staff());
-create policy price_edit on settings          for update using (is_price_editor());
+-- Staff-only tables: any active staff member can read and write.
+create policy staff_all on product_barcodes for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on locations        for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on stock            for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on stock_movements  for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on stock_thresholds for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on sales            for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on sale_lines       for all to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy staff_all on delivery_trips   for all to authenticated using ((select is_staff())) with check ((select is_staff()));
 
--- Customers see only their own account, documents, orders and payments.
-create policy own_account on customers for select using (auth_user_id = auth.uid());
-create policy own_docs on customer_documents for select using (customer_id = my_customer_id());
-create policy own_orders on orders for select using (customer_id = my_customer_id());
-create policy own_lines on order_lines for select
-  using (exists (select 1 from orders o where o.id = order_id and o.customer_id = my_customer_id()));
-create policy own_payments on payments for select
-  using (exists (select 1 from orders o where o.id = order_id and o.customer_id = my_customer_id()));
+-- Staff accounts: everyone on staff can see the list; only managers change it.
+create policy staff_select on staff for select to authenticated using ((select is_staff()));
+create policy staff_insert on staff for insert to authenticated with check ((select is_manager()));
+create policy staff_update on staff for update to authenticated using ((select is_manager())) with check ((select is_manager()));
+create policy staff_delete on staff for delete to authenticated using ((select is_manager()));
 
--- Signed-in customers can browse active products. Prices each side sees
--- (wholesale vs retail) are filtered in the API layer, and stock is exposed
--- only as In stock / Low / Out through the view below.
-create policy customers_browse on products for select
-  using (active and my_customer_id() is not null);
-create policy customers_browse on pack_sizes for select
-  using (my_customer_id() is not null);
+-- Prices: everyone on staff reads them, only price editors (4 managers) change them.
+create policy products_select on products for select to authenticated
+  using ((select is_staff()) or (active and (select my_customer_id()) is not null));
+create policy products_insert on products for insert to authenticated with check ((select is_price_editor()));
+create policy products_update on products for update to authenticated using ((select is_price_editor())) with check ((select is_price_editor()));
+create policy products_delete on products for delete to authenticated using ((select is_price_editor()));
 
-create view product_availability with (security_invoker = false) as
-select
-  p.id as product_id,
-  l.catalog,
-  case
-    when coalesce(sum(s.quantity), 0) <= 0 then 'out'
-    when coalesce(sum(s.quantity), 0) < coalesce(max(t.min_qty), 1) then 'low'
-    else 'in_stock'
-  end as availability
-from products p
-cross join (select distinct catalog from locations) l
-left join locations loc on loc.catalog = l.catalog
-left join stock s on s.location_id = loc.id and s.product_id = p.id
-left join stock_thresholds t on t.product_id = p.id and t.catalog = l.catalog
-where p.active
-group by p.id, l.catalog;
+create policy pack_sizes_select on pack_sizes for select to authenticated
+  using ((select is_staff()) or (select my_customer_id()) is not null);
+create policy pack_sizes_insert on pack_sizes for insert to authenticated with check ((select is_price_editor()));
+create policy pack_sizes_update on pack_sizes for update to authenticated using ((select is_price_editor())) with check ((select is_price_editor()));
+create policy pack_sizes_delete on pack_sizes for delete to authenticated using ((select is_price_editor()));
+
+create policy settings_select on settings for select to authenticated using ((select is_staff()));
+create policy settings_update on settings for update to authenticated using ((select is_price_editor())) with check ((select is_price_editor()));
+
+-- Customer data: staff see everything; customers see only their own.
+create policy customers_select on customers for select to authenticated
+  using ((select is_staff()) or auth_user_id = (select auth.uid()));
+create policy customers_insert on customers for insert to authenticated with check ((select is_staff()));
+create policy customers_update on customers for update to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy customers_delete on customers for delete to authenticated using ((select is_staff()));
+
+create policy docs_select on customer_documents for select to authenticated
+  using ((select is_staff()) or customer_id = (select my_customer_id()));
+create policy docs_insert on customer_documents for insert to authenticated with check ((select is_staff()));
+create policy docs_update on customer_documents for update to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy docs_delete on customer_documents for delete to authenticated using ((select is_staff()));
+
+create policy orders_select on orders for select to authenticated
+  using ((select is_staff()) or customer_id = (select my_customer_id()));
+create policy orders_insert on orders for insert to authenticated with check ((select is_staff()));
+create policy orders_update on orders for update to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy orders_delete on orders for delete to authenticated using ((select is_staff()));
+
+create policy lines_select on order_lines for select to authenticated
+  using ((select is_staff()) or exists (select 1 from orders o where o.id = order_id and o.customer_id = (select my_customer_id())));
+create policy lines_insert on order_lines for insert to authenticated with check ((select is_staff()));
+create policy lines_update on order_lines for update to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy lines_delete on order_lines for delete to authenticated using ((select is_staff()));
+
+create policy payments_select on payments for select to authenticated
+  using ((select is_staff()) or exists (select 1 from orders o where o.id = order_id and o.customer_id = (select my_customer_id())));
+create policy payments_insert on payments for insert to authenticated with check ((select is_staff()));
+create policy payments_update on payments for update to authenticated using ((select is_staff())) with check ((select is_staff()));
+create policy payments_delete on payments for delete to authenticated using ((select is_staff()));
+
+-- Customers see stock only as In stock / Low / Out, never exact counts.
+create or replace function product_availability()
+returns table (product_id uuid, catalog catalog_kind, availability text)
+language sql stable security definer set search_path = public as $$
+  select
+    p.id,
+    c.catalog,
+    case
+      when coalesce(sum(s.quantity), 0) <= 0 then 'out'
+      when coalesce(sum(s.quantity), 0) < coalesce(max(t.min_qty), 1) then 'low'
+      else 'in_stock'
+    end
+  from products p
+  cross join (values ('retail'::catalog_kind), ('warehouse'::catalog_kind)) c(catalog)
+  left join locations l on l.catalog = c.catalog
+  left join stock s on s.location_id = l.id and s.product_id = p.id
+  left join stock_thresholds t on t.product_id = p.id and t.catalog = c.catalog
+  where p.active
+  group by p.id, c.catalog;
+$$;

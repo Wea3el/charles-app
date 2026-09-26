@@ -43,7 +43,7 @@ The full living plan is the Claude Docs document "Store System Plan: Deliverable
 ## Phases
 
 0. Decide and gather: pricing rules check, export old POS data, type up paper records, store layout, accounts.
-1. Catalog + inventory.
+1. Catalog + inventory. **Built** (2026-09-26): see README "Status".
 2. Register (with offline mode and Square Terminal).
 3. Online ordering (wholesale + retail).
 4. Delivery routes and driver view.
@@ -57,3 +57,9 @@ The full living plan is the Claude Docs document "Store System Plan: Deliverable
 5. How many days ahead can customers order?
 6. Payment terms for invoice customers; flag overdue balances?
 7. Retail online orders: pickup or delivery, pay online or in store, cash or card price?
+
+## Phase 1 notes
+
+- Stock changes go through database functions (`inv_receive`, `inv_restock`, `inv_move`, `inv_count`) so each change is atomic and logged in `stock_movements`.
+- Access checks live in the `private` schema (not exposed through the API). Row level security: any active staff member can view and move stock; only price editors can change products and prices; only managers manage staff.
+- Starting storage spots were seeded (Industrial Fridge 1–2, Warehouse A–B, Front Fridge 1–4). Rename, add or delete them under Inventory > Edit storage spots.

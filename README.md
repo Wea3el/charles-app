@@ -30,13 +30,19 @@ docs/PLAN.md        plan summary and open questions
 
 ## Getting started
 
-1. Install Node.js 20 or newer.
-2. `npm install`
-3. Copy `.env.example` to `.env.local` and fill in the keys (Supabase first; the rest can wait).
-4. Create a Supabase project, then run `supabase/migrations/0001_init.sql` in its SQL editor (or `supabase db push` with the Supabase CLI).
-5. `npm run dev` and open http://localhost:3000
+1. Install Node.js 20 or newer, then `npm install`.
+2. Create `.env.local` from `.env.example`:
+   - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the publishable key): Supabase > Project Settings > API.
+   - `SUPABASE_SERVICE_ROLE_KEY` (secret key, same page): only needed so managers can create staff logins. Never commit it.
+3. The database is already set up in the Supabase project (migrations in `supabase/migrations/`, applied in order).
+4. `npm run dev` and open http://localhost:3000/store
 
-Other commands: `npm test` (unit tests), `npm run lint`, `npm run build`.
+### First sign-in
+
+1. In Supabase > Authentication > Users, click **Add user** and create your own login (email + password, auto-confirm).
+2. Sign in at `/login`. The very first person to sign in becomes the first manager (with price editing).
+3. Add everyone else from **Staff** in the store app (needs the service role key).
+4. Until the wholesale website is built, turn off **Allow new users to sign up** in Supabase > Authentication > Sign In / Providers, so nobody else can create an account.
 
 ## Deploying
 
@@ -44,4 +50,12 @@ Import this repository in Vercel, add the same environment variables, and every 
 
 ## Status
 
-Phase 0 scaffold: database schema, pricing logic, and page shells for each front door. Store sections linked from `/store` are not built yet; see the phase list in docs/PLAN.md.
+Phase 1 (catalog + inventory) is built:
+
+- Staff login, first-manager setup, staff management (only 4 people can change prices)
+- Products: case size, cost, wholesale and party case prices, retail pack sizes with cash/card prices, barcodes, low-stock levels, spreadsheet import with a template
+- Inventory map of every storage spot, search that highlights where an item is, per-spot item lists
+- Receive, restock the front (cases become singles), move, and count, with barcode scanning
+- Low-stock tab (restock the front / reorder from supplier) and full stock history
+
+Next: Phase 2 (register). See docs/PLAN.md.

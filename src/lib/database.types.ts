@@ -127,30 +127,42 @@ export type Database = {
       };
       sale_lines: {
         Row: {
-          id: string; line_discount: number; location_id: string | null; pack_size_id: string | null;
-          product_id: string; quantity: number; sale_id: string; unit_cost: number | null; unit_price: number;
+          discount_kind: E["discount_kind"] | null; discount_value: number | null; id: string;
+          line_discount: number; line_total: number; location_id: string | null; pack_label: string | null;
+          pack_size_id: string | null; pack_units: number; product_id: string; quantity: number; sale_id: string;
+          unit_cost: number | null; unit_price: number;
         };
-        Insert: Partial<Database["public"]["Tables"]["sale_lines"]["Row"]> & {
+        Insert: Partial<Omit<Database["public"]["Tables"]["sale_lines"]["Row"], "line_total">> & {
+          pack_units: number;
           product_id: string; quantity: number; sale_id: string; unit_price: number;
         };
-        Update: Partial<Database["public"]["Tables"]["sale_lines"]["Row"]>;
-        Relationships: [];
+        Update: Partial<Omit<Database["public"]["Tables"]["sale_lines"]["Row"], "line_total">>;
+        Relationships: [
+          { foreignKeyName: "sale_lines_sale_id_fkey"; columns: ["sale_id"]; isOneToOne: false; referencedRelation: "sales"; referencedColumns: ["id"] },
+          { foreignKeyName: "sale_lines_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+          { foreignKeyName: "sale_lines_pack_size_id_fkey"; columns: ["pack_size_id"]; isOneToOne: false; referencedRelation: "pack_sizes"; referencedColumns: ["id"] },
+          { foreignKeyName: "sale_lines_location_id_fkey"; columns: ["location_id"]; isOneToOne: false; referencedRelation: "locations"; referencedColumns: ["id"] },
+        ];
       };
       sales: {
         Row: {
-          client_id: string | null; created_at: string; discount_amount: number;
-          discount_kind: E["discount_kind"] | null; discount_value: number | null; id: string;
-          price_mode: E["price_mode"]; recorded_offline: boolean; square_checkout_id: string | null;
-          staff_id: string | null; subtotal: number; total: number;
+          cash_tendered: number | null; change_given: number | null; client_id: string | null; created_at: string;
+          discount_amount: number; discount_kind: E["discount_kind"] | null; discount_value: number | null; id: string;
+          price_mode: E["price_mode"]; recorded_offline: boolean; sale_number: number; sold_at: string;
+          square_checkout_id: string | null; square_payment_id: string | null; staff_id: string | null;
+          subtotal: number; total: number; void_reason: string | null; voided_at: string | null; voided_by: string | null;
         };
-        Insert: Partial<Database["public"]["Tables"]["sales"]["Row"]> & { price_mode: E["price_mode"]; subtotal: number; total: number };
-        Update: Partial<Database["public"]["Tables"]["sales"]["Row"]>;
-        Relationships: [];
+        Insert: Partial<Omit<Database["public"]["Tables"]["sales"]["Row"], "sale_number">> & { price_mode: E["price_mode"]; subtotal: number; total: number };
+        Update: Partial<Omit<Database["public"]["Tables"]["sales"]["Row"], "sale_number">>;
+        Relationships: [
+          { foreignKeyName: "sales_staff_id_fkey"; columns: ["staff_id"]; isOneToOne: false; referencedRelation: "staff"; referencedColumns: ["id"] },
+          { foreignKeyName: "sales_voided_by_fkey"; columns: ["voided_by"]; isOneToOne: false; referencedRelation: "staff"; referencedColumns: ["id"] },
+        ];
       };
       settings: {
         Row: {
           card_markup_percent: number | null; empty_credit_rate: number; id: boolean; same_day_cutoff: string;
-          store_address: string | null; store_latitude: number | null; store_longitude: number | null;
+          store_address: string | null; store_latitude: number | null; store_longitude: number | null; timezone: string;
         };
         Insert: Partial<Database["public"]["Tables"]["settings"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["settings"]["Row"]>;
@@ -200,6 +212,15 @@ export type Database = {
           { foreignKeyName: "stock_thresholds_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
         ];
       };
+      terminal_checkouts: {
+        Row: {
+          amount: number; created_at: string; id: string; sale_client_id: string; square_checkout_id: string | null;
+          square_payment_id: string | null; staff_id: string | null; status: E["checkout_status"]; updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["terminal_checkouts"]["Row"]> & { amount: number; sale_client_id: string };
+        Update: Partial<Database["public"]["Tables"]["terminal_checkouts"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: {
       low_stock: {
@@ -210,6 +231,13 @@ export type Database = {
         };
         Relationships: [];
       };
+      register_daily: {
+        Row: {
+          discounts: number | null; gross: number | null; offline_count: number | null; price_mode: E["price_mode"] | null;
+          sale_date: string | null; sales_count: number | null; total: number | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       claim_first_manager: { Args: { p_full_name: string }; Returns: boolean };
@@ -217,6 +245,16 @@ export type Database = {
       inv_move: { Args: { p_from: string; p_note?: string; p_product: string; p_qty: number; p_to: string }; Returns: undefined };
       inv_receive: { Args: { p_location: string; p_note?: string; p_product: string; p_qty: number }; Returns: undefined };
       inv_restock: { Args: { p_cases: number; p_from: string; p_note?: string; p_product: string; p_to: string }; Returns: number };
+      record_sale: { Args: { p_sale: Json }; Returns: string };
+      void_sale: { Args: { p_reason: string; p_sale: string }; Returns: undefined };
+      shop_catalog: {
+        Args: { p_kind: E["customer_kind"] };
+        Returns: {
+          availability: string; brand: string | null; case_price: number | null; case_size: number;
+          category: string | null; name: string; packs: Json | null; party_case_price: number | null;
+          prices_visible: boolean; product_id: string;
+        }[];
+      };
       product_availability: {
         Args: never;
         Returns: { availability: string; catalog: E["catalog_kind"]; product_id: string }[];
@@ -225,12 +263,13 @@ export type Database = {
     Enums: {
       account_status: "pending" | "approved" | "rejected" | "suspended";
       catalog_kind: "retail" | "warehouse";
+      checkout_status: "pending" | "in_progress" | "cancel_requested" | "canceled" | "completed";
       customer_kind: "wholesale" | "retail";
       delivery_status: "not_started" | "prepared" | "en_route" | "heading_to_customer" | "delivered";
       discount_kind: "percent" | "flat";
       line_status: "pending" | "confirmed" | "partial" | "declined";
       location_kind: "commercial_fridge" | "industrial_fridge" | "warehouse_area";
-      movement_kind: "receive" | "restock" | "move" | "sale" | "order_pick" | "adjust" | "count";
+      movement_kind: "receive" | "restock" | "move" | "sale" | "order_pick" | "adjust" | "count" | "sale_void";
       order_channel: "online" | "in_store" | "phone";
       order_status: "submitted" | "confirmed" | "partially_confirmed" | "cancelled" | "completed";
       payment_method: "cash" | "check" | "card" | "zelle" | "invoice";

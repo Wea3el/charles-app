@@ -9,6 +9,7 @@ const KIND: Record<string, string> = {
   move: "Moved",
   count: "Counted",
   sale: "Sold",
+  sale_void: "Sale voided",
   order_pick: "Order",
   adjust: "Adjusted",
 };

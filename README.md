@@ -58,4 +58,13 @@ Phase 1 (catalog + inventory) is built:
 - Receive, restock the front (cases become singles), move, and count, with barcode scanning
 - Low-stock tab (restock the front / reorder from supplier) and full stock history
 
-Next: Phase 2 (register). See docs/PLAN.md.
+Phase 2 (register) is built:
+
+- Register at `/store/register`: scan or search, pick Single / 4 pack / 6 pack, cash/card price toggle, % or $ discounts per line or on the whole sale
+- Cash with change, or card on the Square Terminal (set the `SQUARE_*` variables; until then use "Card paid on terminal")
+- Works offline: every sale is saved on the laptop first and synced when the connection is back; the page reloads offline after one online visit (production build only)
+- Sales at `/store/sales`: daily totals by cash and card, every sale with its items, voids (managers; stock goes back)
+
+Shop previews (Phase 3 groundwork): `/shop/wholesale` and `/shop/retail` show the live catalog with In stock / Low / Out and a cart. Retail asks for 21+. Wholesale prices only show to approved business accounts and staff. Placing orders and customer sign-up come in Phase 3.
+
+Next: Phase 3 (online ordering). See docs/PLAN.md.

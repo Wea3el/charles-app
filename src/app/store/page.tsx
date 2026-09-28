@@ -1,6 +1,8 @@
 import { PageShell, Tile } from "@/components/Tile";
 
 const ready = [
+  { href: "/store/register", title: "Register", body: "Ring up sales: scan, pick the pack, cash or card price, discounts. Works offline." },
+  { href: "/store/sales", title: "Sales", body: "Today's totals by cash and card, every sale, and voids (managers)." },
   { href: "/store/inventory", title: "Inventory", body: "Map of every fridge and warehouse spot. Search to see where an item is." },
   { href: "/store/inventory/actions", title: "Receive / Restock / Move", body: "Log deliveries, bring cases to the front fridges, move stock, count." },
   { href: "/store/low-stock", title: "Low stock", body: "What to restock from the warehouse and what to reorder." },
@@ -8,7 +10,7 @@ const ready = [
   { href: "/store/inventory/history", title: "History", body: "Every stock change and who made it." },
 ];
 
-const coming = ["Register (Phase 2)", "Daily dashboard (Phase 2)", "Orders and customers (Phase 3)", "Delivery routes (Phase 4)"];
+const coming = ["Orders and customers (Phase 3)", "Delivery routes (Phase 4)"];
 
 export default function StoreHome() {
   return (

@@ -30,7 +30,7 @@ export async function signIn(_prev: ActionResult, form: FormData): Promise<Actio
     return fail("This login isn't set up as staff. Ask a manager to add you.");
   }
 
-  redirect(next && next.startsWith("/store") ? next : "/store");
+  redirect(next && (next.startsWith("/store") || next.startsWith("/shop")) ? next : "/store");
 }
 
 export async function signOut() {

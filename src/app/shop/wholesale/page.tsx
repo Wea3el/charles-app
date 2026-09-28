@@ -1,12 +1,29 @@
-import { PageShell } from "@/components/Tile";
+import Link from "next/link";
+import { loadShopCatalog } from "@/lib/shop";
+import { ShopCatalog } from "../ShopCatalog";
+import { ShopShell } from "../ShopShell";
 
-// Phase 3: sign-up (license + tax ID upload, awaits approval), catalog with
-// In stock / Low / Out, ordering with 3 PM same-day cutoff, order status + stop number.
-export default function WholesaleShop() {
+// Phase 3 adds: sign-up (license + tax ID upload, awaits approval), placing
+// orders, order status and stop number.
+export default async function WholesaleShop() {
+  const { items, pricesVisible } = await loadShopCatalog("wholesale");
   return (
-    <PageShell
+    <ShopShell
       title="Wholesale ordering"
-      lead="Sign in with your approved business account to order. New customers can apply with their liquor license and tax ID."
-    />
+      lead={
+        pricesVisible ? (
+          "Case prices for your account. Stock shows as In stock, Low or Out."
+        ) : (
+          <>
+            Prices show once you sign in with an approved business account. Business accounts (liquor license and tax ID) open soon.{" "}
+            <Link href="/login?next=/shop/wholesale" className="underline">
+              Staff sign in
+            </Link>
+          </>
+        )
+      }
+    >
+      <ShopCatalog kind="wholesale" items={items} pricesVisible={pricesVisible} />
+    </ShopShell>
   );
 }

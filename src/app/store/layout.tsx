@@ -3,6 +3,8 @@ import { requireStaff } from "@/lib/auth";
 import { signOut } from "@/app/login/actions";
 
 const links = [
+  { href: "/store/register", label: "Register" },
+  { href: "/store/sales", label: "Sales" },
   { href: "/store/inventory", label: "Inventory" },
   { href: "/store/inventory/actions", label: "Receive / Restock / Move" },
   { href: "/store/low-stock", label: "Low stock" },

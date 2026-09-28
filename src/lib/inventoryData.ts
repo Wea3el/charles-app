@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import type { BarcodeHit, Loc, Product, StockRow } from "@/lib/inventory";
+import { toCents, type RegisterProduct } from "@/lib/register";
 
 type Client = Awaited<ReturnType<typeof createClient>>;
 
 /** Supabase returns at most 1000 rows per request; page through everything. */
-async function fetchAll<T>(page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) {
+export async function fetchAll<T>(page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) {
   const size = 1000;
   const out: T[] = [];
   for (let from = 0; ; from += size) {
@@ -52,4 +53,37 @@ export async function loadInventory() {
   ];
 
   return { locations, products, stock, barcodes };
+}
+
+/** Everything the register needs to sell without the network: active products, packs, barcodes. */
+export async function loadRegisterCatalog(): Promise<RegisterProduct[]> {
+  const supabase = await createClient();
+  const rows = await fetchAll((a, b) =>
+    supabase
+      .from("products")
+      .select("id, name, brand, case_size, active, pack_sizes(id, label, units, barcode, cash_price, card_price), product_barcodes(barcode, is_case)")
+      .eq("active", true)
+      .order("name")
+      .range(a, b),
+  );
+  return rows
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      brand: p.brand,
+      case_size: p.case_size,
+      active: p.active,
+      packs: p.pack_sizes
+        .map((s) => ({
+          id: s.id,
+          label: s.label,
+          units: s.units,
+          barcode: s.barcode,
+          cashPriceCents: toCents(s.cash_price),
+          cardPriceCents: toCents(s.card_price),
+        }))
+        .sort((x, y) => x.units - y.units),
+      barcodes: p.product_barcodes.map((b) => ({ code: b.barcode, isCase: b.is_case })),
+    }))
+    .filter((p) => p.packs.length > 0);
 }

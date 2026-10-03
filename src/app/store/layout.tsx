@@ -1,43 +1,22 @@
-import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { signOut } from "@/app/login/actions";
-
-const links = [
-  { href: "/store/register", label: "Register" },
-  { href: "/store/sales", label: "Sales" },
-  { href: "/store/inventory", label: "Inventory" },
-  { href: "/store/inventory/actions", label: "Receive / Restock / Move" },
-  { href: "/store/low-stock", label: "Low stock" },
-  { href: "/store/products", label: "Products" },
-  { href: "/store/inventory/history", label: "History" },
-];
+import { Button } from "@/components/ui";
+import { StoreTitle } from "./StoreTitle";
 
 export default async function StoreLayout({ children }: LayoutProps<"/store">) {
   const staff = await requireStaff();
   return (
     <div className="flex min-h-full flex-col">
-      <header className="border-b border-black/10 dark:border-white/15">
-        <nav className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 text-sm">
-          <Link href="/store" className="font-bold">
-            Store
-          </Link>
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className="opacity-80 hover:opacity-100">
-              {l.label}
-            </Link>
-          ))}
-          {staff.role === "manager" && (
-            <Link href="/store/staff" className="opacity-80 hover:opacity-100">
-              Staff
-            </Link>
-          )}
-          <span className="ml-auto opacity-60">{staff.full_name}</span>
+      <header className="flex min-h-[60px] items-center gap-3 border-b border-(--color-divider) px-5 py-3">
+        <StoreTitle />
+        <div className="flex items-center gap-2 text-[13px] text-(--color-neutral-700)">
+          <span>{staff.full_name}</span>
           <form action={signOut}>
-            <button className="underline opacity-80 hover:opacity-100">Sign out</button>
+            <Button variant="ghost">Sign out</Button>
           </form>
-        </nav>
+        </div>
       </header>
-      {children}
+      <main className="mx-auto flex w-full max-w-[1080px] flex-1 flex-col gap-6 px-5 pt-6 pb-10">{children}</main>
     </div>
   );
 }

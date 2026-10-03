@@ -7,7 +7,7 @@ import { AgeGate } from "./AgeGate";
 export default async function RetailShop() {
   const { items } = await loadShopCatalog("retail");
   return (
-    <ShopShell title="Retail ordering" lead="What's in the front fridges right now. You must be 21 or older to order; ID is checked at pickup or delivery.">
+    <ShopShell kind="retail" title="Retail ordering" lead="What's in the front fridges right now. You must be 21 or older to order; ID is checked at pickup or delivery.">
       <AgeGate>
         <ShopCatalog kind="retail" items={items} pricesVisible />
       </AgeGate>

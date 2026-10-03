@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { PageShell } from "@/components/Tile";
-import { Badge, Card, Input } from "@/components/ui";
+import { PageShell } from "@/components/ui";
+import { Badge, Button, ButtonLink, Card, Input, Notice } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { formatCents } from "@/lib/pricing";
 import { toCents } from "@/lib/register";
@@ -51,34 +50,28 @@ export default async function SalesPage(props: PageProps<"/store/sales">) {
   const voided = sales.filter((s) => s.voided_at).length;
 
   return (
-    <PageShell title="Sales" lead="Register sales for one day, in store time. Voided sales are left out of the totals.">
-      <form className="mb-6 flex flex-wrap items-center gap-3">
-        <Link href={`/store/sales?date=${shiftDays(date, -1)}`} className="underline">
-          ← Previous day
-        </Link>
+    <PageShell lead="Register sales for one day, in store time. Voided sales are left out of the totals.">
+      <form className="flex flex-wrap items-center gap-3">
+        <ButtonLink href={`/store/sales?date=${shiftDays(date, -1)}`}>← Previous day</ButtonLink>
         <Input type="date" name="date" defaultValue={date} className="!w-44" />
-        <button className="rounded-lg border border-black/15 px-3 py-2 text-sm dark:border-white/20">Show</button>
-        {date !== today && (
-          <Link href="/store/sales" className="underline">
-            Today
-          </Link>
-        )}
+        <Button variant="secondary">Show</Button>
+        {date !== today && <ButtonLink href="/store/sales">Today</ButtonLink>}
       </form>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Card>
-          <div className="text-sm opacity-70">Total</div>
-          <div className="text-3xl font-bold tabular-nums">{formatCents(all.total)}</div>
-          <div className="text-sm opacity-70">
+          <div className="text-sm text-(--color-neutral-700)">Total</div>
+          <div className="font-(family-name:--font-heading) text-3xl font-semibold tabular-nums">{formatCents(all.total)}</div>
+          <div className="text-sm text-(--color-neutral-700)">
             {all.count} sale{all.count === 1 ? "" : "s"}
             {voided > 0 && ` · ${voided} voided`}
           </div>
         </Card>
         {(["cash", "card"] as const).map((m) => (
           <Card key={m}>
-            <div className="text-sm capitalize opacity-70">{m}</div>
-            <div className="text-2xl font-bold tabular-nums">{money(by(m)?.total ?? 0)}</div>
-            <div className="text-sm opacity-70">
+            <div className="text-sm capitalize text-(--color-neutral-700)">{m}</div>
+            <div className="font-(family-name:--font-heading) text-2xl font-semibold tabular-nums">{money(by(m)?.total ?? 0)}</div>
+            <div className="text-sm text-(--color-neutral-700)">
               {by(m)?.sales_count ?? 0} sales · discounts {money(by(m)?.discounts ?? 0)}
               {(by(m)?.offline_count ?? 0) > 0 && ` · ${by(m)?.offline_count} rung up offline`}
             </div>
@@ -86,36 +79,36 @@ export default async function SalesPage(props: PageProps<"/store/sales">) {
         ))}
       </div>
 
-      {error && <p className="text-red-700">{error.message}</p>}
-      {sales.length === 0 && <p className="opacity-70">No sales on this day.</p>}
-      <ul className="space-y-3">
+      {error && <Notice ok={false}>{error.message}</Notice>}
+      {sales.length === 0 && <p className="!m-0 text-(--color-neutral-700)">No sales on this day.</p>}
+      <ul className="!m-0 flex list-none flex-col gap-3 !p-0">
         {sales.map((s) => (
-          <li key={s.id} className={`rounded-xl border border-black/10 dark:border-white/15 ${s.voided_at ? "opacity-60" : ""}`}>
+          <li key={s.id} className={`border border-(--color-divider) ${s.voided_at ? "text-(--color-neutral-700)" : ""}`}>
             <details>
-              <summary className="flex cursor-pointer flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
+              <summary className="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-(--color-accent-100)">
                 <span className="font-semibold">#{s.sale_number}</span>
                 <span className="tabular-nums">{time.format(new Date(s.sold_at))}</span>
                 <Badge tone={s.price_mode === "cash" ? "warehouse" : "retail"}>{s.price_mode}</Badge>
                 {s.recorded_offline && <Badge>offline</Badge>}
                 {s.voided_at && <Badge tone="warn">voided</Badge>}
-                <span className="opacity-70">{s.cashier?.full_name}</span>
+                <span className="text-(--color-neutral-700)">{s.cashier?.full_name}</span>
                 <span className={`ml-auto font-semibold tabular-nums ${s.voided_at ? "line-through" : ""}`}>{money(s.total)}</span>
               </summary>
-              <div className="border-t border-black/10 px-4 py-3 text-sm dark:border-white/15">
-                <table className="w-full">
+              <div className="border-t border-(--color-divider) px-4 py-3 text-sm">
+                <table className="table">
                   <tbody>
                     {s.sale_lines.map((l) => (
                       <tr key={l.id}>
-                        <td className="py-1 pr-3">
+                        <td>
                           {l.products?.name} · {l.pack_label}
                         </td>
-                        <td className="py-1 pr-3 tabular-nums">
+                        <td className="tabular-nums">
                           {l.quantity} × {money(l.unit_price)}
                         </td>
-                        <td className="py-1 pr-3 tabular-nums text-green-700 dark:text-green-300">
+                        <td className="tabular-nums text-(--color-accent-700)">
                           {Number(l.line_discount) > 0 ? `−${money(l.line_discount)}` : ""}
                         </td>
-                        <td className="py-1 text-right tabular-nums">{money(l.line_total)}</td>
+                        <td className="text-right tabular-nums">{money(l.line_total)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -124,14 +117,14 @@ export default async function SalesPage(props: PageProps<"/store/sales">) {
                   {Number(s.discount_amount) > 0 && <div>Sale discount −{money(s.discount_amount)}</div>}
                   <div className="font-semibold">Total {money(s.total)}</div>
                   {s.cash_tendered !== null && (
-                    <div className="opacity-70">
+                    <div className="text-(--color-neutral-700)">
                       Cash {money(s.cash_tendered)} · change {money(s.change_given)}
                     </div>
                   )}
-                  {s.square_payment_id && <div className="opacity-70">Square payment {s.square_payment_id}</div>}
+                  {s.square_payment_id && <div className="text-(--color-neutral-700)">Square payment {s.square_payment_id}</div>}
                 </div>
                 {s.voided_at ? (
-                  <p className="mt-2 text-red-700 dark:text-red-300">
+                  <p className="!mt-2 !mb-0 font-semibold text-(--color-accent-900)">
                     Voided by {s.voider?.full_name} at {time.format(new Date(s.voided_at))}: {s.void_reason}
                   </p>
                 ) : (

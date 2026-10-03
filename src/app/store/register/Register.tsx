@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, Input, Notice } from "@/components/ui";
+import { Button, Card, Corners, Input, Notice } from "@/components/ui";
 import { searchProducts } from "@/lib/inventory";
 import { cartTotals, formatCents, lineTotal, packPrice, type PriceMode } from "@/lib/pricing";
 import {
@@ -202,7 +202,7 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-      <section className="min-w-0 space-y-4">
+      <section className="flex min-w-0 flex-col gap-4">
         <StatusBar online={online} waiting={outbox.length} refused={refused.length} onSync={sync} />
         {refused.map((s) => (
           <Notice key={s.payload.client_id} ok={false}>
@@ -227,17 +227,17 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
                   onScan();
                 }
               }}
-              className="text-lg"
+              className="!min-h-14 !text-lg"
               aria-label="Scan or search"
             />
-            {scanMessage && <p className="mt-1 text-sm text-red-700 dark:text-red-300">{scanMessage}</p>}
+            {scanMessage && <p className="mt-1 mb-0 text-sm font-semibold text-(--color-accent-900)">{scanMessage}</p>}
             {results.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-black/15 bg-background shadow-lg dark:border-white/20">
+              <ul className="absolute z-10 mt-1 w-full overflow-hidden border border-(--color-divider) bg-(--color-bg)">
                 {results.map((p) => (
                   <li key={p.id}>
                     <button
                       type="button"
-                      className="block w-full px-3 py-2 text-left hover:bg-black/5 dark:hover:bg-white/10"
+                      className="block min-h-11 w-full px-3 py-2 text-left hover:bg-(--color-accent-100)"
                       onClick={() => {
                         if (p.packs.length === 1) return add(p, p.packs[0]);
                         setChoosing(p);
@@ -245,7 +245,7 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
                       }}
                     >
                       {p.name}
-                      <span className="ml-2 text-xs opacity-60">from {formatCents(packPrice(p.packs[0], mode))}</span>
+                      <span className="ml-2 text-xs text-(--color-neutral-700)">from {formatCents(packPrice(p.packs[0], mode))}</span>
                     </button>
                   </li>
                 ))}
@@ -257,11 +257,11 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
         {choosing && <PackChooser product={choosing} mode={mode} onPick={(p) => add(choosing, p)} onClose={() => setChoosing(null)} />}
 
         {lines.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-black/15 p-8 text-center opacity-60 dark:border-white/20">
+          <p className="m-0 border border-dashed border-(--color-divider) p-8 text-center text-(--color-neutral-700)">
             Scan the first item to start a sale.
           </p>
         ) : (
-          <ul className="divide-y divide-black/10 rounded-xl border border-black/10 dark:divide-white/15 dark:border-white/15">
+          <ul className="divide-y divide-(--color-divider) border border-(--color-divider)">
             {lines.map((l) => (
               <CartRow
                 key={l.key}
@@ -276,8 +276,8 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
         )}
       </section>
 
-      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-        <div className="grid grid-cols-2 gap-1 rounded-xl bg-black/5 p-1 dark:bg-white/10" role="radiogroup" aria-label="Price">
+      <aside className="flex flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
+        <div className="grid grid-cols-2 border border-(--color-divider)" role="radiogroup" aria-label="Price">
           {(["cash", "card"] as const).map((m) => (
             <button
               key={m}
@@ -286,14 +286,14 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
               aria-checked={mode === m}
               disabled={phase !== "cart"}
               onClick={() => setMode(m)}
-              className={`rounded-lg py-3 text-lg font-bold capitalize transition ${mode === m ? "bg-background shadow" : "opacity-60"}`}
+              className={`min-h-14 font-(family-name:--font-heading) text-[19px] font-semibold capitalize disabled:cursor-not-allowed ${mode === m ? "bg-(--color-accent) text-(--color-bg)" : "text-(--color-neutral-700) enabled:hover:bg-(--color-accent-100)"}`}
             >
               {m} price
             </button>
           ))}
         </div>
 
-        <div className="space-y-1 rounded-xl border border-black/10 p-4 dark:border-white/15">
+        <Card className="flex flex-col gap-1">
           <Row label={`Items (${totals.singlesUsed} single${totals.singlesUsed === 1 ? "" : "s"})`} value={formatCents(totals.subtotalCents)} />
           {phase === "cart" ? (
             <label className="flex items-center justify-between gap-3 py-1 text-sm">
@@ -302,21 +302,21 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
                 value={saleDiscountText}
                 onChange={(e) => setSaleDiscountText(e.target.value)}
                 placeholder="10% or 2.00"
-                className={`!w-28 !py-1 text-right ${saleDiscount === "invalid" ? "!border-red-600" : ""}`}
+                className={`!w-28 text-right ${saleDiscount === "invalid" ? "!border-(--color-accent-900)" : ""}`}
               />
             </label>
           ) : null}
           {totals.orderDiscountCents > 0 && <Row label="Discount" value={`−${formatCents(totals.orderDiscountCents)}`} />}
-          <div className="flex items-baseline justify-between border-t border-black/10 pt-2 dark:border-white/15">
+          <div className="flex items-baseline justify-between border-t border-(--color-divider) pt-2">
             <span className="font-semibold">Total</span>
-            <span className="text-3xl font-bold tabular-nums">{formatCents(totals.totalCents)}</span>
+            <span className="font-(family-name:--font-heading) text-4xl font-semibold tabular-nums">{formatCents(totals.totalCents)}</span>
           </div>
-        </div>
+        </Card>
 
         {phase === "cart" && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Button
-              className="w-full !py-4 !text-lg"
+              className="w-full !min-h-14 !text-[19px]"
               disabled={lines.length === 0 || saleDiscount === "invalid"}
               onClick={() => (mode === "cash" ? setPhase("cash") : void startCard())}
             >
@@ -332,7 +332,7 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
 
         {phase === "cash" && (
           <form
-            className="space-y-3"
+            className="flex flex-col gap-3"
             onSubmit={(e) => {
               e.preventDefault();
               if (cashOk) finish({ cashTenderedCents: tenderedCents! });
@@ -346,7 +346,7 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
                 value={tendered}
                 onChange={(e) => setTendered(e.target.value)}
                 placeholder="0.00"
-                className="mt-1 text-2xl"
+                className="mt-1 !text-2xl"
               />
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -357,11 +357,11 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
               ))}
             </div>
             {cashOk && (
-              <p className="text-lg">
-                Change: <strong className="text-2xl">{formatCents(tenderedCents! - totals.totalCents)}</strong>
+              <p className="m-0 text-lg">
+                Change: <strong className="font-(family-name:--font-heading) text-3xl font-semibold">{formatCents(tenderedCents! - totals.totalCents)}</strong>
               </p>
             )}
-            <Button className="w-full !py-4 !text-lg" disabled={!cashOk}>
+            <Button className="w-full !min-h-14 !text-[19px]" disabled={!cashOk}>
               Complete sale
             </Button>
             <Button type="button" variant="secondary" className="w-full" onClick={() => setPhase("cart")}>
@@ -371,8 +371,8 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
         )}
 
         {phase === "card" && (
-          <div className="space-y-3">
-            <p className="text-lg font-semibold">
+          <div className="flex flex-col gap-3">
+            <p className="m-0 text-lg font-semibold">
               {card.status === "sending"
                 ? "Sending to the terminal..."
                 : card.status === "failed"
@@ -406,16 +406,16 @@ export function Register({ catalog, staffId }: { catalog: RegisterProduct[]; sta
         )}
 
         {phase === "done" && done && (
-          <div className="space-y-3 rounded-xl bg-green-50 p-4 text-green-950 dark:bg-green-950 dark:text-green-50">
-            <p className="text-lg font-semibold">
+          <div role="status" className="flex flex-col gap-3 border border-(--color-accent-300) bg-(--color-accent-100) p-4 text-(--color-accent-900)">
+            <p className="m-0 text-lg font-semibold">
               Sale complete · {done.mode} · {formatCents(done.totalCents)}
             </p>
             {done.changeCents !== null && (
-              <p>
-                Change due: <strong className="text-3xl">{formatCents(done.changeCents)}</strong>
+              <p className="m-0">
+                Change due: <strong className="font-(family-name:--font-heading) text-4xl font-semibold">{formatCents(done.changeCents)}</strong>
               </p>
             )}
-            <Button autoFocus className="w-full !py-4 !text-lg" onClick={clearSale}>
+            <Button autoFocus className="w-full !min-h-14 !text-[19px]" onClick={clearSale}>
               New sale
             </Button>
           </div>
@@ -429,21 +429,21 @@ function StatusBar({ online, waiting, refused, onSync }: { online: boolean; wait
   return (
     <div className="flex flex-wrap items-center gap-3 text-sm">
       <span
-        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-medium ${
-          online ? "bg-green-100 text-green-900 dark:bg-green-950 dark:text-green-100" : "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+        className={`inline-flex items-center gap-2 border px-3 py-1 font-medium ${
+          online ? "border-(--color-divider) text-(--color-neutral-700)" : "border-(--color-accent) font-semibold text-(--color-accent-900)"
         }`}
       >
-        <span className={`h-2 w-2 rounded-full ${online ? "bg-green-600" : "bg-amber-600"}`} />
+        <span className={`h-2 w-2 ${online ? "bg-(--color-accent)" : "border border-(--color-accent-900)"}`} />
         {online ? "Online" : "Offline: sales are saved on this laptop"}
       </span>
       {waiting > 0 && (
         <>
-          <span className="opacity-70">
+          <span className="text-(--color-neutral-700)">
             {waiting - refused} sale{waiting - refused === 1 ? "" : "s"} waiting to sync
           </span>
-          <button type="button" className="underline" onClick={onSync}>
+          <Button type="button" variant="ghost" onClick={onSync}>
             Sync now
-          </button>
+          </Button>
         </>
       )}
     </div>
@@ -464,7 +464,7 @@ function PackChooser({
   // The first pack has focus: Enter picks it, Tab/arrows move, Escape closes.
   return (
     <div
-      className="rounded-xl border-2 border-foreground p-4"
+      className="blueprint p-4"
       onKeyDown={(e) => {
         if (e.key === "Escape") onClose();
         if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
@@ -474,11 +474,12 @@ function PackChooser({
         }
       }}
     >
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-semibold">{product.name}: which pack?</h2>
-        <button type="button" className="text-sm underline" onClick={onClose}>
+      <Corners />
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="!m-0 !text-[20px]">{product.name}: which pack?</h2>
+        <Button type="button" variant="ghost" onClick={onClose}>
           Cancel
-        </button>
+        </Button>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {product.packs.map((p, i) => (
@@ -488,7 +489,7 @@ function PackChooser({
             data-pack
             autoFocus={i === 0}
             onClick={() => onPick(p)}
-            className="rounded-lg border border-black/15 p-3 text-left hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+            className="flex min-h-14 flex-col justify-center border border-(--color-divider) p-3 text-left hover:bg-(--color-accent-100)"
           >
             <span className="block font-semibold">{p.label}</span>
             <span className="text-sm tabular-nums">{formatCents(packPrice(p, mode))}</span>
@@ -522,10 +523,10 @@ function CartRow({
     <li className="flex flex-wrap items-center gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
         <div className="font-medium">{line.product.name}</div>
-        <div className="text-sm opacity-70">
+        <div className="text-sm text-(--color-neutral-700)">
           {line.pack.label} · {formatCents(packPrice(line.pack, mode))} each
           {line.discount && (
-            <span className="ml-2 text-green-700 dark:text-green-300">
+            <span className="ml-2 font-semibold text-(--color-accent-700)">
               −{line.discount.kind === "percent" ? `${line.discount.value}%` : formatCents(line.discount.cents)}
             </span>
           )}
@@ -545,7 +546,7 @@ function CartRow({
         <span className="tabular-nums">×{line.quantity}</span>
       )}
       <div className="w-24 text-right tabular-nums">
-        {net !== gross && <div className="text-xs line-through opacity-50">{formatCents(gross)}</div>}
+        {net !== gross && <div className="text-xs text-(--color-neutral-700) line-through">{formatCents(gross)}</div>}
         <div className="font-semibold">{formatCents(net)}</div>
       </div>
       {editable && (
@@ -566,17 +567,17 @@ function CartRow({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="10% or 1.00, blank to remove"
-                className={`!w-56 !py-1 text-sm ${bad ? "!border-red-600" : ""}`}
+                className={`!w-56 ${bad ? "!border-(--color-accent-900)" : ""}`}
               />
-              <Button className="!py-1">Apply</Button>
-              <button type="button" className="text-sm underline" onClick={() => setEditing(false)}>
+              <Button>Apply</Button>
+              <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
                 Cancel
-              </button>
+              </Button>
             </form>
           ) : (
-            <button type="button" className="text-xs underline opacity-70" onClick={() => setEditing(true)}>
+            <Button type="button" variant="ghost" onClick={() => setEditing(true)}>
               {line.discount ? "Change discount" : "Discount this line"}
-            </button>
+            </Button>
           )}
         </div>
       )}

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { loadShopCatalog } from "@/lib/shop";
 import { ShopCatalog } from "../ShopCatalog";
 import { ShopShell } from "../ShopShell";
@@ -9,18 +8,13 @@ export default async function WholesaleShop() {
   const { items, pricesVisible } = await loadShopCatalog("wholesale");
   return (
     <ShopShell
+      kind="wholesale"
+      signIn={!pricesVisible}
       title="Wholesale ordering"
       lead={
-        pricesVisible ? (
-          "Case prices for your account. Stock shows as In stock, Low or Out."
-        ) : (
-          <>
-            Prices show once you sign in with an approved business account. Business accounts (liquor license and tax ID) open soon.{" "}
-            <Link href="/login?next=/shop/wholesale" className="underline">
-              Staff sign in
-            </Link>
-          </>
-        )
+        pricesVisible
+          ? "Case prices for your account. Stock shows as In stock, Low or Out."
+          : "Prices show once you sign in with an approved business account. Business accounts (liquor license and tax ID) open soon."
       }
     >
       <ShopCatalog kind="wholesale" items={items} pricesVisible={pricesVisible} />

@@ -35,7 +35,7 @@ export function ProductForm({ product, canEdit }: { product?: Tables<"products">
             <Input name="party_case_price" inputMode="decimal" defaultValue={money(product?.party_case_price)} />
           </Field>
           {product && (
-            <label className="flex items-center gap-2 self-end pb-2 text-sm">
+            <label className="flex min-h-11 items-center gap-2 self-end text-sm">
               <input type="hidden" name="has_active" value="1" />
               <input type="checkbox" name="active" defaultChecked={product.active} /> Active (uncheck to hide a discontinued item)
             </label>
@@ -60,7 +60,7 @@ const presets = [
 
 export function PackRow({ pack, productId, canEdit }: { pack?: Tables<"pack_sizes">; productId: string; canEdit: boolean }) {
   return (
-    <div className="flex flex-wrap items-end gap-2 border-b border-black/10 py-3 dark:border-white/15">
+    <div className="flex flex-wrap items-end gap-2 border-b border-(--color-divider) py-3">
       <ActionForm action={savePack} className="flex flex-1 flex-wrap items-end gap-2">
         {(pending) => (
           <fieldset disabled={!canEdit} className="contents">
@@ -93,7 +93,7 @@ export function PackRow({ pack, productId, canEdit }: { pack?: Tables<"pack_size
         <form action={deletePack}>
           <input type="hidden" name="id" value={pack.id} />
           <input type="hidden" name="product_id" value={productId} />
-          <Button variant="secondary" className="text-red-700">
+          <Button variant="danger">
             Remove
           </Button>
         </form>
@@ -109,17 +109,17 @@ export function PackRow({ pack, productId, canEdit }: { pack?: Tables<"pack_size
 
 export function Barcodes({ productId, barcodes }: { productId: string; barcodes: Tables<"product_barcodes">[] }) {
   return (
-    <div className="space-y-3">
-      {barcodes.length === 0 && <p className="text-sm opacity-60">No extra barcodes.</p>}
-      <ul className="space-y-1">
+    <div className="flex flex-col gap-3">
+      {barcodes.length === 0 && <p className="!m-0 text-sm text-(--color-neutral-700)">No extra barcodes.</p>}
+      <ul className="!m-0 flex list-none flex-col gap-1 !p-0">
         {barcodes.map((b) => (
           <li key={b.barcode} className="flex items-center gap-3 text-sm">
             <span className="font-mono">{b.barcode}</span>
-            {b.is_case && <span className="opacity-60">case</span>}
+            {b.is_case && <span className="text-(--color-neutral-700)">case</span>}
             <form action={deleteBarcode}>
               <input type="hidden" name="barcode" value={b.barcode} />
               <input type="hidden" name="product_id" value={productId} />
-              <button className="text-red-700 underline">remove</button>
+              <Button variant="danger">Remove</Button>
             </form>
           </li>
         ))}
@@ -131,7 +131,7 @@ export function Barcodes({ productId, barcodes }: { productId: string; barcodes:
             <Field label="Add barcode" hint="Scan it with the scanner, or type it.">
               <Input name="barcode" className="!w-56" />
             </Field>
-            <label className="flex items-center gap-2 pb-2 text-sm">
+            <label className="flex min-h-11 items-center gap-2 text-sm">
               <input type="checkbox" name="is_case" /> This is a case barcode
             </label>
             <Button variant="secondary" disabled={pending}>
@@ -160,8 +160,8 @@ export function ThresholdsForm({
       {(pending) => (
         <>
           <input type="hidden" name="product_id" value={productId} />
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Front fridges (singles)</p>
+          <div className="flex flex-col gap-2">
+            <p className="!m-0 text-sm font-medium">Front fridges (singles)</p>
             <div className="flex gap-2">
               <Field label="Low at">
                 <Input name="retail_min" type="number" min={0} defaultValue={retail?.min_qty ?? ""} />
@@ -171,8 +171,8 @@ export function ThresholdsForm({
               </Field>
             </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Warehouse (cases)</p>
+          <div className="flex flex-col gap-2">
+            <p className="!m-0 text-sm font-medium">Warehouse (cases)</p>
             <div className="flex gap-2">
               <Field label="Low at">
                 <Input name="warehouse_min" type="number" min={0} defaultValue={warehouse?.min_qty ?? ""} />

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { PageShell } from "@/components/Tile";
+import { PageShell } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { ProductForm } from "../ProductForms";
 

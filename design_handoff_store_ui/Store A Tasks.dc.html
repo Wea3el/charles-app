@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-a3dfb453-76de-4f5e-9300-ec07ff357ce8/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<script src="_ds/industry-a3dfb453-76de-4f5e-9300-ec07ff357ce8/_ds_bundle.js"></script>
+<script src="storeData.js"></script>
+<style>body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-900)}</style>
+</helmet>
+<div style="min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:15px;display:flex;flex-direction:column">
+  <header style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--color-divider);min-height:60px">
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:22px;letter-spacing:-0.01em;margin-right:auto">Store</div>
+    </sc-if>
+    <sc-if value="{{ notHome }}" hint-placeholder-val="{{ false }}">
+      <button class="btn btn-secondary" onClick="{{ goHome }}" style="min-height:44px;padding:0 14px;font-size:15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Home</button>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:22px;margin-right:auto">{{ title }}</div>
+    </sc-if>
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-neutral-700)"><span>{{ staffName }}</span><button class="btn btn-ghost" style="font-size:13px">Sign out</button></div>
+  </header>
+
+  <main style="flex:1;width:100%;max-width:1080px;margin:0 auto;padding:24px 20px 40px;display:flex;flex-direction:column;gap:24px">
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <h1 style="margin:0;font-size:36px">What are you doing?</h1>
+        <p style="margin:0;color:var(--color-neutral-700)">Pick a task. Every screen has a Home button to come back here.</p>
+      </div>
+      <button onClick="{{ goFind }}" style="display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:0 16px;background:var(--color-surface);border:1px solid var(--color-divider);font:inherit;font-size:17px;color:var(--color-neutral-600);cursor:pointer;text-align:left" style-hover="border-color:var(--color-accent)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        Where is it? Type a product or brand
+      </button>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:20px">
+        <button class="blueprint" onClick="{{ tReceive }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;min-height:150px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"></path><path d="M19 13v6"></path><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="m7.5 4.27 9 5.15"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" x2="12" y1="22" y2="12"></line></svg>
+          <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:21px;line-height:1.1">Receive delivery</span><span style="font-size:13px;color:var(--color-neutral-700)">A supplier delivery arrived</span></span>
+        </button>
+        <button class="blueprint" onClick="{{ tRestock }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;min-height:150px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 9-6-6-6 6"></path><path d="M12 3v14"></path><path d="M5 21h14"></path></svg>
+          <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:21px;line-height:1.1">Restock front</span><span style="font-size:13px;color:var(--color-neutral-700)">Warehouse cases into a fridge</span></span>
+        </button>
+        <button class="blueprint" onClick="{{ tMove }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;min-height:150px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg>
+          <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:21px;line-height:1.1">Move stock</span><span style="font-size:13px;color:var(--color-neutral-700)">Between two spots</span></span>
+        </button>
+        <button class="blueprint" onClick="{{ tCount }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;min-height:150px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>
+          <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:21px;line-height:1.1">Count a spot</span><span style="font-size:13px;color:var(--color-neutral-700)">Fix the number by hand</span></span>
+        </button>
+        <button class="blueprint" onClick="{{ goLow }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;min-height:150px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <span style="display:flex;align-items:center;gap:10px;width:100%"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span class="tag tag-accent" style="margin-left:auto;font-size:13px">{{ lowText }}</span></span>
+          <span style="display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:21px;line-height:1.1">Low stock</span><span style="font-size:13px;color:var(--color-neutral-700)">Restock or reorder</span></span>
+        </button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button class="btn btn-secondary" onClick="{{ goProducts }}" style="min-height:44px;padding:0 16px;font-size:15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>Products and prices</button>
+        <button class="btn btn-secondary" onClick="{{ goHistory }}" style="min-height:44px;padding:0 16px;font-size:15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>History</button>
+        <button class="btn btn-secondary" style="min-height:44px;padding:0 16px;font-size:15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Staff</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isFind }}" hint-placeholder-val="{{ false }}">
+      <label style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;background:var(--color-surface);border:1px solid var(--color-accent)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Type a product or brand, e.g. corona" style="flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:18px;color:var(--color-text);outline:none">
+        <sc-if value="{{ hasQ }}"><button class="btn btn-ghost" onClick="{{ clearQ }}">Clear</button></sc-if>
+      </label>
+      <sc-if value="{{ hasQ }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-if value="{{ noResults }}"><p style="margin:0">No products match “{{ q }}”.</p></sc-if>
+          <sc-for list="{{ results }}" as="r">
+            <div class="blueprint" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:14px 16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="font-family:var(--font-heading);font-weight:600;font-size:19px;min-width:180px">{{ r.name }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;flex:1">
+                <sc-for list="{{ r.spots }}" as="s"><span class="tag tag-accent" style="font-size:13px;padding:5px 10px">{{ s.name }} · {{ s.label }}</span></sc-for>
+                <sc-if value="{{ r.none }}"><span style="font-size:14px;color:var(--color-accent-900);font-weight:600">None in stock</span></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-for list="{{ groups }}" as="g">
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><h4 style="margin:0">{{ g.label }}</h4><span class="tag tag-neutral">{{ g.unitNote }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+            <sc-for list="{{ g.locs }}" as="l">
+              <button onClick="{{ l.onClick }}" style="display:flex;flex-direction:column;gap:4px;padding:14px;min-height:84px;text-align:left;font:inherit;color:inherit;cursor:pointer;background:{{ l.bg }};border:1px solid {{ l.bd }};opacity:{{ l.op }}">
+                <span style="font-weight:600">{{ l.name }}</span>
+                <span style="font-size:13px;color:var(--color-neutral-700)">{{ l.summary }}</span>
+                <span style="font-size:13px;font-weight:600;color:var(--color-accent-800)">{{ l.hitText }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+      </sc-for>
+      <sc-if value="{{ hasDetail }}">
+        <section class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0">{{ detail.name }}</h3><button class="btn btn-secondary" onClick="{{ closeDetail }}" style="min-height:40px">Close</button></div>
+          <sc-if value="{{ detail.empty }}"><p style="margin:0" class="text-muted">Nothing here.</p></sc-if>
+          <table class="table" style="font-size:15px"><thead><tr><th>Item</th><th style="text-align:right">{{ detail.unitHead }}</th></tr></thead>
+            <tbody><sc-for list="{{ detail.items }}" as="it"><tr><td>{{ it.name }}</td><td style="text-align:right;font-weight:600;font-size:18px;font-variant-numeric:tabular-nums">{{ it.qty }}</td></tr></sc-for></tbody>
+          </table>
+        </section>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isTask }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ hasDone }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--color-accent-100);color:var(--color-accent-900);border:1px solid var(--color-accent-300)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+          <span style="flex:1">{{ done }}</span><button class="btn btn-secondary" onClick="{{ goHome }}">Done</button>
+        </div>
+      </sc-if>
+      <div class="seg" style="display:flex;width:100%;max-width:640px">
+        <sc-for list="{{ taskTabs }}" as="t"><button onClick="{{ t.onClick }}" style="flex:1;min-height:44px;padding:0 6px;white-space:nowrap;border:0;border-right:1px solid var(--color-divider);font:inherit;font-size:14px;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button></sc-for>
+      </div>
+      <p style="margin:0;color:var(--color-neutral-700);max-width:640px">{{ task.help }}</p>
+
+      <div style="display:flex;flex-direction:column;gap:28px;max-width:640px">
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">1</span><h4 style="margin:0">Product</h4></div>
+          <sc-if value="{{ hasProduct }}">
+            <div class="blueprint" style="display:flex;align-items:center;gap:12px;padding:14px 16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-heading);font-weight:600;font-size:20px">{{ product.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ productNote }}</span></div>
+              <button class="btn btn-secondary" onClick="{{ clearProduct }}" style="min-height:44px">Change</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noProduct }}">
+            <div style="display:flex;gap:10px">
+              <input class="input" value="{{ pq }}" onChange="{{ onPq }}" placeholder="Type a name or brand" style="flex:1;min-height:48px;font-size:16px">
+              <button class="btn btn-secondary" onClick="{{ scan }}" style="min-height:48px;padding:0 14px;font-size:15px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M8 7v10"></path><path d="M12 7v10"></path><path d="M17 7v10"></path></svg>Scan</button>
+            </div>
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ pResults }}" as="r"><button onClick="{{ r.onPick }}" style="display:flex;justify-content:space-between;gap:12px;min-height:48px;padding:10px 12px;border:0;border-bottom:1px solid var(--color-divider);background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)"><span style="font-weight:500">{{ r.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ r.frontLabel }} front · {{ r.backLabel }} back</span></button></sc-for>
+            </div>
+          </sc-if>
+        </section>
+
+        <sc-for list="{{ fields }}" as="fd">
+          <section style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">{{ fd.n }}</span><h4 style="margin:0">{{ fd.label }}</h4></div>
+            <sc-if value="{{ fd.waiting }}"><p style="margin:0" class="text-muted">Pick “From” first.</p></sc-if>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+              <sc-for list="{{ fd.options }}" as="o">
+                <button onClick="{{ o.onClick }}" style="display:flex;flex-direction:column;gap:2px;min-height:56px;padding:10px 12px;text-align:left;font:inherit;color:inherit;cursor:pointer;background:{{ o.bg }};border:1px solid {{ o.bd }}"><span style="font-weight:600">{{ o.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ o.qtyText }}</span></button>
+              </sc-for>
+            </div>
+          </section>
+        </sc-for>
+
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">{{ qtyStep }}</span><h4 style="margin:0">{{ qtyLabel }}</h4></div>
+          <div style="display:flex;align-items:center;gap:0">
+            <button class="btn btn-secondary" onClick="{{ dec }}" aria-label="Less" style="width:56px;height:56px;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+            <input value="{{ qty }}" onChange="{{ onQty }}" inputmode="numeric" style="width:96px;height:56px;text-align:center;font-family:var(--font-heading);font-weight:600;font-size:28px;border:1px solid var(--color-divider);border-left:0;border-right:0;background:var(--color-surface);color:var(--color-text)">
+            <button class="btn btn-secondary" onClick="{{ inc }}" aria-label="More" style="width:56px;height:56px;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+            <span style="margin-left:14px;font-size:14px;color:var(--color-neutral-700)">{{ qtyHint }}</span>
+          </div>
+          <input class="input" value="{{ note }}" onChange="{{ onNote }}" placeholder="{{ notePh }}" style="min-height:44px;font-size:15px;margin-top:6px">
+        </section>
+
+        <button class="btn btn-primary blueprint" disabled="{{ cantSubmit }}" onClick="{{ submit }}" style="min-height:56px;font-size:19px;width:100%"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ submitLabel }}</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isLow }}" hint-placeholder-val="{{ false }}">
+      <p style="margin:0;color:var(--color-neutral-700)">Items below their low-stock level. Set levels on each product's page.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><h3 style="margin:0">Restock the front fridges</h3><span class="tag tag-neutral">singles</span></div>
+          <p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Bring these from the warehouse.</p>
+          <sc-for list="{{ lowFront }}" as="r">
+            <div class="blueprint" style="display:flex;align-items:center;gap:12px;padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-weight:600">{{ r.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ r.detail }}</span><sc-if value="{{ r.short }}"><span style="font-size:13px;font-weight:600;color:var(--color-accent-900)">Only {{ r.wh }} cases in the warehouse</span></sc-if></div>
+              <button class="btn btn-primary" onClick="{{ r.onGo }}" style="min-height:44px;padding:0 14px;font-size:15px">Bring {{ r.bring }} case</button>
+            </div>
+          </sc-for>
+        </section>
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><h3 style="margin:0">Reorder for the warehouse</h3><span class="tag tag-neutral">cases</span></div>
+          <p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Order these from the supplier.</p>
+          <sc-for list="{{ lowWh }}" as="r">
+            <div class="blueprint" style="display:flex;align-items:center;gap:12px;padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-weight:600">{{ r.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ r.detail }}</span></div>
+              <div style="text-align:right"><div style="font-family:var(--font-heading);font-weight:600;font-size:22px">{{ r.order }}</div><div style="font-size:12px;color:var(--color-neutral-700)">cases to order</div></div>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProducts }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <input class="input" value="{{ prodQ }}" onChange="{{ onProdQ }}" placeholder="Search by name or brand" style="flex:1;min-width:200px;min-height:48px;font-size:16px">
+        <button class="btn btn-primary" style="min-height:48px;padding:0 16px;font-size:15px">New product</button>
+        <button class="btn btn-secondary" style="min-height:48px;padding:0 16px;font-size:15px">Import spreadsheet</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        <sc-for list="{{ prodRows }}" as="p">
+          <div class="blueprint" style="display:flex;flex-direction:column;gap:10px;padding:16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div><div style="font-family:var(--font-heading);font-weight:600;font-size:19px">{{ p.name }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ p.sub }} · case of {{ p.case_size }}</div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:13px">
+              <div><div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Cost</div><div style="font-weight:600">{{ p.costT }}</div></div>
+              <div><div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Wholesale</div><div style="font-weight:600">{{ p.wholesaleT }}</div></div>
+              <div><div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Party</div><div style="font-weight:600">{{ p.partyT }}</div></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ p.packList }}" as="k"><span class="tag tag-neutral">{{ k.label }} {{ k.cash }} / {{ k.card }}</span></sc-for></div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:0;font-size:13px" class="text-muted">Retail packs show cash / card price.</p>
+    </sc-if>
+
+    <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ history }}" as="h">
+          <div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding:14px 0;border-bottom:1px solid var(--color-divider)">
+            <span style="width:130px;font-size:13px;color:var(--color-neutral-700)">{{ h.when }}</span>
+            <span style="flex:1;min-width:200px"><strong style="font-weight:600">{{ h.what }}</strong> {{ h.item }}<br><span style="font-size:13px;color:var(--color-neutral-700)">{{ h.detail }}</span></span>
+            <span style="font-size:13px">{{ h.who }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820},&quot;start&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;find&quot;,&quot;task&quot;,&quot;low&quot;,&quot;products&quot;,&quot;history&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;startTask&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;startProduct&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;startQuery&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { screen: this.props.start || "home", q: this.props.startQuery || "", sel: null, task: this.props.startTask || "receive", product: this.props.startProduct || null, pq: "", f: {}, qty: 1, note: "", done: null, prodQ: "", scanned: false };
+  componentDidMount() { if (!window.STORE) this.t = setInterval(() => { if (window.STORE) { clearInterval(this.t); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { clearInterval(this.t); }
+  go(screen, extra) { this.setState(Object.assign({ screen, done: null }, extra || {})); }
+  startTask(task, product) { this.go("task", { task, product: product || null, pq: "", f: {}, qty: 1, note: "", scanned: false }); }
+  renderVals() {
+    const S = window.STORE;
+    const st = this.state;
+    if (!S) return { isHome: st.screen === "home" };
+    const titles = { find: "Find an item", task: "Stock", low: "Low stock", products: "Products", history: "History" };
+    const prod = st.product ? S.byId.get(st.product) : null;
+    const spotQty = new Map(prod ? S.spotsFor(prod.id).map((s) => [s.id, s.qty]) : []);
+    const loc = (id) => S.locById.get(id);
+    const T = S.TASKS[st.task];
+    const setF = (k, v) => this.setState((s) => { const f = Object.assign({}, s.f, { [k]: v }); if (k === "from") delete f.to; return { f }; });
+    const opt = (key, filter, exclude) => S.spotOptions(filter).filter((o) => o.id !== exclude).map((o) => {
+      const sel = st.f[key] === o.id;
+      const q = spotQty.get(o.id) || 0;
+      return { name: o.name, qtyText: prod ? q + " " + S.unit(o.catalog, q) + " here" : o.catalog === "retail" ? "singles" : "cases", onClick: () => setF(key, o.id), bg: sel ? "var(--color-accent-100)" : "transparent", bd: sel ? "var(--color-accent)" : "var(--color-divider)" };
+    });
+    const fromCat = st.f.from ? loc(st.f.from).catalog : null;
+    const defs = {
+      receive: [{ key: "to", label: "Put it in", options: opt("to") }],
+      restock: [{ key: "from", label: "From (warehouse)", options: opt("from", "warehouse") }, { key: "to", label: "Into (front fridge)", options: opt("to", "retail") }],
+      move: [{ key: "from", label: "From", options: opt("from") }, { key: "to", label: "To", options: st.f.from ? opt("to", fromCat, st.f.from) : [], waiting: !st.f.from }],
+      count: [{ key: "to", label: "Spot you counted", options: opt("to") }],
+    }[st.task];
+    const fields = defs.map((d, i) => Object.assign(d, { n: i + 2 }));
+    const qtyLoc = st.task === "move" ? st.f.from : st.f.to;
+    const u = st.task === "restock" ? "cases" : qtyLoc ? S.unit(loc(qtyLoc).catalog, 2) : "units";
+    const qtyLabel = st.task === "restock" ? "How many cases" : st.task === "count" ? "Counted (" + u + ")" : "How many (" + u + ")";
+    const qtyHint = st.task === "restock" && prod && st.qty > 0 ? "= " + st.qty * prod.case_size + " singles into the fridge" : st.task === "count" && prod && st.f.to ? "System has " + (spotQty.get(st.f.to) || 0) : "";
+    const ready = prod && fields.every((d) => st.f[d.key]) && st.qty >= (st.task === "count" ? 0 : 1);
+    const submit = () => {
+      if (!ready) return;
+      const n = st.qty, nm = prod.name, to = st.f.to && loc(st.f.to).name, from = st.f.from && loc(st.f.from).name;
+      const msg = { receive: `Received ${n} ${u} of ${nm} into ${to}.`, restock: `Moved ${n} cases of ${nm} from ${from} into ${to} (${n * prod.case_size} singles).`, move: `Moved ${n} ${u} of ${nm} from ${from} to ${to}.`, count: `${to} now shows ${n} ${u} of ${nm}.` }[st.task];
+      this.setState({ done: msg, product: null, pq: "", qty: 1, note: "", scanned: false });
+    };
+    const detail = st.sel ? S.itemsAt(st.sel) : null;
+    const groups = S.locationGroups(st.q).map((g) => Object.assign(g, { locs: g.locs.map((l) => Object.assign(l, {
+      onClick: () => this.setState({ sel: st.sel === l.id ? null : l.id }),
+      bg: l.hit ? "var(--color-accent-100)" : "transparent",
+      bd: st.sel === l.id || l.hit ? "var(--color-accent)" : "var(--color-divider)",
+      op: l.dim ? 0.4 : 1,
+    })) }));
+    const results = S.search(st.q);
+    return {
+      isHome: st.screen === "home", notHome: st.screen !== "home", isFind: st.screen === "find", isTask: st.screen === "task", isLow: st.screen === "low", isProducts: st.screen === "products", isHistory: st.screen === "history",
+      title: titles[st.screen], staffName: S.staff.name, lowText: S.low.count + " items",
+      goHome: () => this.go("home"), goFind: () => this.go("find"), goLow: () => this.go("low"), goProducts: () => this.go("products"), goHistory: () => this.go("history"),
+      tReceive: () => this.startTask("receive"), tRestock: () => this.startTask("restock"), tMove: () => this.startTask("move"), tCount: () => this.startTask("count"),
+      q: st.q, hasQ: !!st.q.trim(), onQ: (e) => this.setState({ q: e.target.value }), clearQ: () => this.setState({ q: "" }),
+      results, noResults: !!st.q.trim() && results.length === 0, groups, hasDetail: !!detail, detail: detail || {}, closeDetail: () => this.setState({ sel: null }),
+      taskTabs: Object.values(S.TASKS).map((t) => ({ label: t.id === "restock" ? "Restock" : t.label, onClick: () => this.setState({ task: t.id, f: {}, done: null }), bg: t.id === st.task ? "var(--color-accent)" : "transparent", fg: t.id === st.task ? "var(--color-bg)" : "var(--color-text)" })),
+      task: T, hasDone: !!st.done, done: st.done,
+      hasProduct: !!prod, noProduct: !prod, product: prod || {}, productNote: prod ? (st.scanned ? "Scanned a case barcode · " : "") + S.totals(prod.id).frontLabel + " front · " + S.totals(prod.id).backLabel + " back" : "",
+      clearProduct: () => this.setState({ product: null, pq: "" }),
+      pq: st.pq, onPq: (e) => this.setState({ pq: e.target.value }),
+      pResults: S.search(st.pq).map((r) => Object.assign(r, { onPick: () => this.setState({ product: r.id, done: null }) })),
+      scan: () => this.setState((s) => ({ product: "corona", scanned: true, done: null, f: s.task === "receive" && !s.f.to ? { to: "if1" } : s.f })),
+      fields, qtyStep: fields.length + 2, qtyLabel, qtyHint, qty: st.qty,
+      dec: () => this.setState((s) => ({ qty: Math.max(0, s.qty - 1) })), inc: () => this.setState((s) => ({ qty: s.qty + 1 })),
+      onQty: (e) => this.setState({ qty: Math.max(0, parseInt(e.target.value, 10) || 0) }),
+      note: st.note, onNote: (e) => this.setState({ note: e.target.value }), notePh: st.task === "receive" ? "Note (optional): supplier or invoice #" : "Note (optional)",
+      cantSubmit: !ready, submit, submitLabel: T.label,
+      lowFront: S.low.front.map((r) => Object.assign(r, { onGo: () => this.startTask("restock", r.product_id) })), lowWh: S.low.warehouse,
+      prodQ: st.prodQ, onProdQ: (e) => this.setState({ prodQ: e.target.value }), prodRows: S.productRows(st.prodQ),
+      history: S.history,
+    };
+  }
+}
+</script>
+</body>
+</html>

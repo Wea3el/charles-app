@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageShell } from "@/components/Tile";
-import { Card, unitLabel } from "@/components/ui";
+import { PageShell } from "@/components/ui";
+import { ButtonLink, Card, unitLabel } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Barcodes, PackRow, ProductForm, ThresholdsForm } from "../ProductForms";
@@ -25,20 +24,18 @@ export default async function ProductPage(props: PageProps<"/store/products/[id]
 
   return (
     <PageShell title={product.name}>
-      <p className="-mt-6 mb-6 text-sm">
-        <Link href="/store/products" className="underline opacity-70">
-          All products
-        </Link>
-      </p>
-      <div className="space-y-6">
+      <div>
+        <ButtonLink href="/store/products">← All products</ButtonLink>
+      </div>
+      <div className="flex flex-col gap-6">
         <Card>
-          <h2 className="mb-3 font-semibold">Details and case prices</h2>
+          <h2 className="!mt-0 !mb-3 !text-[20px]">Details and case prices</h2>
           <ProductForm product={product} canEdit={canEdit} />
         </Card>
 
         <Card>
-          <h2 className="font-semibold">Retail pack sizes</h2>
-          <p className="mb-2 text-sm opacity-70">
+          <h2 className="!m-0 !text-[20px]">Retail pack sizes</h2>
+          <p className="!mt-1 !mb-2 text-sm text-(--color-neutral-700)">
             Scanning a single shows these options at the register. Hand-packed 4 and 6 packs don&apos;t need a barcode.
           </p>
           {(packs ?? []).map((p) => (
@@ -49,15 +46,15 @@ export default async function ProductPage(props: PageProps<"/store/products/[id]
 
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
-            <h2 className="mb-3 font-semibold">Other barcodes</h2>
+            <h2 className="!mt-0 !mb-3 !text-[20px]">Other barcodes</h2>
             <Barcodes productId={product.id} barcodes={barcodes ?? []} />
           </Card>
           <Card>
-            <h2 className="mb-3 font-semibold">Where it is now</h2>
+            <h2 className="!mt-0 !mb-3 !text-[20px]">Where it is now</h2>
             {sortedStock.length === 0 ? (
-              <p className="text-sm opacity-60">None in stock.</p>
+              <p className="!m-0 text-sm text-(--color-neutral-700)">None in stock.</p>
             ) : (
-              <ul className="space-y-1 text-sm">
+              <ul className="!m-0 flex list-none flex-col gap-1 !p-0 text-sm">
                 {sortedStock.map((s, i) => (
                   <li key={i} className="flex justify-between">
                     <span>{s.locations?.name}</span>
@@ -70,7 +67,7 @@ export default async function ProductPage(props: PageProps<"/store/products/[id]
         </div>
 
         <Card>
-          <h2 className="mb-3 font-semibold">Low-stock levels</h2>
+          <h2 className="!mt-0 !mb-3 !text-[20px]">Low-stock levels</h2>
           <ThresholdsForm
             productId={product.id}
             caseSize={product.case_size}

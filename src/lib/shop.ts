@@ -45,7 +45,7 @@ export async function loadShopCatalog(kind: ShopKind): Promise<{ items: ShopItem
     partyCasePriceCents: r.party_case_price === null ? null : toCents(r.party_case_price),
     options:
       kind === "wholesale"
-        ? [{ id: r.product_id, label: `Case of ${r.case_size}`, priceCents: r.case_price === null ? null : toCents(r.case_price) }]
+        ? [{ id: r.product_id, label: r.case_size === 1 ? "Each" : `Case of ${r.case_size}`, priceCents: r.case_price === null ? null : toCents(r.case_price) }]
         : ((r.packs as unknown as PackJson[] | null) ?? []).map((p) => ({
             id: p.id,
             label: p.label,

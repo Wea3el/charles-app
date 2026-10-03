@@ -1,4 +1,4 @@
-import { PageShell } from "@/components/Tile";
+import { PageShell } from "@/components/ui";
 import { Card } from "@/components/ui";
 import { requireManager } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -12,9 +12,9 @@ export default async function StaffPage() {
   const editors = (staff ?? []).filter((s) => s.active && s.can_edit_prices).length;
 
   return (
-    <PageShell title="Staff" lead={`${editors} of ${MAX_PRICE_EDITORS} people can change prices.`}>
-      <Card className="mb-8">
-        <h2 className="mb-3 font-semibold">Add a staff member</h2>
+    <PageShell lead={`${editors} of ${MAX_PRICE_EDITORS} people can change prices.`}>
+      <Card>
+        <h2 className="!mt-0 !mb-3 !text-[20px]">Add a staff member</h2>
         <AddStaffForm />
       </Card>
       <div>

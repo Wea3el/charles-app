@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-a3dfb453-76de-4f5e-9300-ec07ff357ce8/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<script src="_ds/industry-a3dfb453-76de-4f5e-9300-ec07ff357ce8/_ds_bundle.js"></script>
+<script src="storeData.js"></script>
+<style>body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-900)}</style>
+</helmet>
+<div ref="{{ rootRef }}" style="min-height:100%;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:15px">
+  <header style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;padding:10px 20px;border-bottom:1px solid var(--color-divider);min-height:60px">
+    <button onClick="{{ goWelcome }}" style="border:0;background:transparent;padding:0;font-family:var(--font-heading);font-weight:600;font-size:22px;color:var(--color-text);cursor:pointer">Charles</button>
+    <sc-if value="{{ notWelcome }}" hint-placeholder-val="{{ false }}">
+      <nav style="display:flex;gap:2px">
+        <sc-for list="{{ kindTabs }}" as="t"><button onClick="{{ t.onClick }}" style="min-height:44px;padding:0 10px;border:0;border-bottom:2px solid {{ t.bar }};background:transparent;font:inherit;font-weight:500;color:{{ t.fg }};cursor:pointer">{{ t.label }}</button></sc-for>
+      </nav>
+    </sc-if>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px">
+      <sc-if value="{{ showAccount }}"><span style="color:var(--color-neutral-700)">{{ accountText }}</span></sc-if>
+      <sc-if value="{{ showSignIn }}"><button class="btn btn-secondary" onClick="{{ signIn }}" style="min-height:40px">Sign in</button></sc-if>
+    </div>
+  </header>
+
+  <main style="flex:1;width:100%;max-width:1180px;box-sizing:border-box;margin:0 auto;padding:28px 20px 40px;display:flex;flex-direction:column;gap:24px">
+
+    <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <h1 style="margin:0;font-size:40px">Welcome</h1>
+        <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Are you ordering as a business or as a regular customer?</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:880px">
+        <button class="blueprint" onClick="{{ goWholesale }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:24px;min-height:200px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
+          <span style="display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-heading);font-weight:600;font-size:30px;line-height:1">Wholesale</span><span style="font-size:15px;color:var(--color-neutral-700)">Licensed businesses: wholesale pricing, delivery, order tracking.</span></span>
+        </button>
+        <button class="blueprint" onClick="{{ goRetail }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:24px;min-height:200px;background:transparent;font:inherit;color:inherit;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-100)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+          <span style="display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-heading);font-weight:600;font-size:30px;line-height:1">Retail</span><span style="font-size:15px;color:var(--color-neutral-700)">Regular customers 21+: browse what's in the fridges and order.</span></span>
+        </button>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Staff? <a href="Store A Tasks.dc.html">Open the store app</a></p>
+    </sc-if>
+
+    <sc-if value="{{ isAge }}" hint-placeholder-val="{{ false }}">
+      <div class="blueprint" style="max-width:480px;padding:28px;display:flex;flex-direction:column;gap:16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <h2 style="margin:0;font-size:32px">Are you 21 or older?</h2>
+        <p style="margin:0;color:var(--color-neutral-700)">We check ID at pickup or delivery.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <button class="btn btn-primary blueprint" onClick="{{ ageYes }}" style="min-height:56px;font-size:18px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Yes, I'm 21+</button>
+          <button class="btn btn-secondary" onClick="{{ ageNo }}" style="min-height:56px;font-size:18px">No</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isUnder }}" hint-placeholder-val="{{ false }}">
+      <p style="margin:0;font-size:20px">Sorry, you must be 21 or older to order.</p>
+    </sc-if>
+
+    <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <h1 style="margin:0;font-size:36px">{{ shopTitle }}</h1>
+        <p style="margin:0;color:var(--color-neutral-700);max-width:720px">{{ shopLead }}</p>
+      </div>
+      <sc-if value="{{ hasDone }}">
+        <div role="status" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;background:var(--color-accent-100);color:var(--color-accent-900);border:1px solid var(--color-accent-300)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+          <span style="flex:1;min-width:200px">{{ done }}</span>
+        </div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:{{ shopCols }};gap:28px;align-items:start">
+        <section style="min-width:0;display:flex;flex-direction:column;gap:14px">
+          <label style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;background:var(--color-surface);border:1px solid var(--color-divider)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Search, e.g. corona" style="flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:18px;color:var(--color-text);outline:none">
+            <sc-if value="{{ hasQ }}"><button class="btn btn-ghost" onClick="{{ clearQ }}">Clear</button></sc-if>
+          </label>
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">
+            <sc-for list="{{ cats }}" as="c"><button onClick="{{ c.onClick }}" style="flex:none;min-height:44px;padding:0 14px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.bd }}">{{ c.label }}</button></sc-for>
+          </div>
+          <sc-if value="{{ noneShown }}"><p style="margin:0">Nothing matches.</p></sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px">
+            <sc-for list="{{ items }}" as="i" hint-placeholder-count="6">
+              <article class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:10px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:flex-start;gap:10px">
+                  <div style="flex:1;min-width:0"><div style="font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1.15">{{ i.name }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ i.sub }}</div></div>
+                  <span class="{{ i.tagClass }}" style="flex:none;font-size:13px">{{ i.avLabel }}</span>
+                </div>
+                <sc-for list="{{ i.options }}" as="o">
+                  <div style="display:flex;align-items:center;gap:10px;min-height:48px;padding-top:10px;border-top:1px solid var(--color-divider)">
+                    <div style="flex:1;min-width:0"><div style="font-size:14px">{{ o.label }}</div><div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px"><span style="font-weight:600;font-size:17px">{{ o.priceT }}</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ o.cardT }}</span></div></div>
+                    <sc-if value="{{ o.notInCart }}"><button class="btn btn-secondary" onClick="{{ o.add }}" style="min-height:44px;padding:0 18px;font-size:15px">Add</button></sc-if>
+                    <sc-if value="{{ o.inCart }}">
+                      <div style="display:flex;align-items:center">
+                        <button class="btn btn-secondary" onClick="{{ o.dec }}" aria-label="One less" style="width:44px;height:44px;padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                        <span style="width:40px;height:42px;display:grid;place-items:center;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:20px">{{ o.qty }}</span>
+                        <button class="btn btn-secondary" onClick="{{ o.inc }}" aria-label="One more" style="width:44px;height:44px;padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ i.hasParty }}"><div style="font-size:13px;color:var(--color-neutral-700)">Party price {{ i.partyT }} / case</div></sc-if>
+              </article>
+            </sc-for>
+          </div>
+        </section>
+
+        <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+          <aside class="blueprint" style="position:sticky;top:16px;padding:18px;display:flex;flex-direction:column;gap:12px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <h3 style="margin:0">{{ orderTitle }}</h3>
+            <sc-if value="{{ cartEmpty }}"><p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Nothing added yet. Tap Add on any item.</p></sc-if>
+            <sc-for list="{{ lines }}" as="l">
+              <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--color-divider)">
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">{{ l.name }}</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ l.label }} · {{ l.lineT }}</div><sc-if value="{{ l.flag }}"><div style="font-size:12px;font-weight:600;color:var(--color-accent-900)">{{ l.flagText }}</div></sc-if></div>
+                <div style="display:flex;align-items:center">
+                  <button class="btn btn-secondary" onClick="{{ l.dec }}" aria-label="One less" style="width:36px;height:36px;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                  <span style="width:32px;text-align:center;font-weight:600">{{ l.qty }}</span>
+                  <button class="btn btn-secondary" onClick="{{ l.inc }}" aria-label="One more" style="width:36px;height:36px;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ showTotal }}"><div style="display:flex;justify-content:space-between;font-weight:600;font-size:17px"><span>Estimated total</span><span>{{ totalT }}</span></div></sc-if>
+            <sc-if value="{{ anyFlag }}"><p style="margin:0;font-size:13px;color:var(--color-neutral-700)">Items that are low or out may be partly filled or declined. We'll email you.</p></sc-if>
+            <sc-if value="{{ needSignIn }}">
+              <p style="margin:0;font-size:14px">Sign in with an approved business account to see prices and order.</p>
+              <button class="btn btn-secondary" onClick="{{ signIn }}" style="min-height:44px">Sign in</button>
+              <button class="btn btn-ghost" style="min-height:40px">Apply for a business account</button>
+            </sc-if>
+            <sc-if value="{{ canCheckout }}"><button class="btn btn-primary blueprint" onClick="{{ goCheckout }}" style="min-height:52px;font-size:17px;width:100%"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Check out</button></sc-if>
+          </aside>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-secondary" onClick="{{ backToShop }}" style="min-height:44px;padding:0 14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Keep shopping</button>
+      </div>
+      <h1 style="margin:0;font-size:36px">Check out</h1>
+      <div style="display:flex;flex-direction:column;gap:28px;max-width:640px">
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">1</span><h4 style="margin:0">{{ orderTitle }}</h4></div>
+          <sc-if value="{{ cartEmpty }}"><p style="margin:0" class="text-muted">Your order is empty.</p></sc-if>
+          <sc-for list="{{ lines }}" as="l">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-divider)">
+              <div style="flex:1;min-width:0"><div style="font-weight:600">{{ l.name }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ l.label }} · {{ l.lineT }}</div><sc-if value="{{ l.flag }}"><div style="font-size:13px;font-weight:600;color:var(--color-accent-900)">{{ l.flagText }}</div></sc-if></div>
+              <div style="display:flex;align-items:center">
+                <button class="btn btn-secondary" onClick="{{ l.dec }}" aria-label="One less" style="width:44px;height:44px;padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                <span style="width:40px;height:42px;display:grid;place-items:center;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:20px">{{ l.qty }}</span>
+                <button class="btn btn-secondary" onClick="{{ l.inc }}" aria-label="One more" style="width:44px;height:44px;padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ anyFlag }}"><p style="margin:0;font-size:13px;color:var(--color-neutral-700)">Items that are low or out may be partly filled or declined. We'll email you.</p></sc-if>
+        </section>
+
+        <sc-if value="{{ needSignIn }}">
+          <div class="blueprint" style="padding:16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <span style="flex:1;min-width:200px">Sign in with an approved business account to see prices and order.</span>
+            <button class="btn btn-secondary" onClick="{{ signIn }}" style="min-height:44px">Sign in</button>
+          </div>
+        </sc-if>
+
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">2</span><h4 style="margin:0">{{ dayTitle }}</h4></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px">
+            <sc-for list="{{ days }}" as="d"><button onClick="{{ d.onClick }}" disabled="{{ d.dis }}" style="display:flex;flex-direction:column;gap:2px;min-height:60px;padding:10px 12px;text-align:left;font:inherit;color:inherit;cursor:pointer;background:{{ d.bg }};border:1px solid {{ d.bd }};opacity:{{ d.op }}"><span style="font-weight:600">{{ d.label }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ d.sub }}</span></button></sc-for>
+          </div>
+          <p style="margin:0;font-size:13px;color:var(--color-neutral-700)">Same-day online orders close at 3 PM. After that, call the store.</p>
+        </section>
+
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--color-accent);color:var(--color-accent-700);font-family:var(--font-heading);font-weight:600">3</span><h4 style="margin:0">{{ payTitle }}</h4></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px">
+            <sc-for list="{{ pays }}" as="p"><button onClick="{{ p.onClick }}" style="min-height:52px;padding:0 12px;font:inherit;font-weight:600;cursor:pointer;background:{{ p.bg }};color:var(--color-text);border:1px solid {{ p.bd }}">{{ p.label }}</button></sc-for>
+          </div>
+          <sc-if value="{{ hasPayNote }}"><p style="margin:0;font-size:13px;color:var(--color-neutral-700)">{{ payNote }}</p></sc-if>
+        </section>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-if value="{{ showTotal }}"><div style="display:flex;justify-content:space-between;font-weight:600;font-size:19px"><span>Estimated total</span><span>{{ totalT }}</span></div></sc-if>
+          <button class="btn btn-primary blueprint" disabled="{{ cantPlace }}" onClick="{{ place }}" style="min-height:56px;font-size:19px;width:100%"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Place order</button>
+          <sc-if value="{{ cantPlace }}"><p style="margin:0;font-size:13px;color:var(--color-neutral-700);text-align:center">{{ missing }}</p></sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ showBar }}" hint-placeholder-val="{{ false }}">
+    <div style="position:sticky;bottom:0;padding:12px 16px;background:var(--color-bg);border-top:1px solid var(--color-divider)">
+      <button class="btn btn-primary blueprint" onClick="{{ goCheckout }}" style="width:100%;min-height:56px;font-size:18px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ barText }}</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820},&quot;start&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;welcome&quot;,&quot;shop&quot;,&quot;checkout&quot;],&quot;default&quot;:&quot;welcome&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;wholesale&quot;,&quot;retail&quot;],&quot;default&quot;:&quot;wholesale&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;device&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;phone&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;signedIn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;ageConfirmed&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;sampleCart&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  rootRef = (el) => {
+    if (!el || this.ro || !window.ResizeObserver) return;
+    const check = (w) => { const n = w < 760; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    this.ro = new ResizeObserver((es) => check(es[0].contentRect.width));
+    this.ro.observe(el);
+    requestAnimationFrame(() => check(el.getBoundingClientRect().width));
+  };
+  state = (() => {
+    const kind = this.props.kind || "wholesale";
+    const sample = this.props.sampleCart ? { wholesale: { "corona:case": 3, "modelo:case": 2, "claw:case": 1, "ice:case": 10 }, retail: { "corona:1": 1, "topo:0": 4, "redbull:1": 1 } } : { wholesale: {}, retail: {} };
+    return { screen: this.props.start || "welcome", kind, age: !!this.props.ageConfirmed, under: false, signedIn: this.props.signedIn ?? true, q: "", cat: null, inStock: false, cart: sample, day: null, pay: null, done: null, narrow: this.props.device === "phone" };
+  })();
+  componentDidMount() {
+    if (!window.STORE) this.t = setInterval(() => { if (window.STORE) { clearInterval(this.t); this.forceUpdate(); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.t); this.ro && this.ro.disconnect(); }
+  setQty(id, q) { this.setState((s) => { const c = Object.assign({}, s.cart[s.kind]); if (q <= 0) delete c[id]; else c[id] = q; return { cart: Object.assign({}, s.cart, { [s.kind]: c }), done: null }; }); }
+  renderVals() {
+    const S = window.STORE, st = this.state;
+    const wide = !st.narrow && this.props.device !== "phone";
+    const base = { rootRef: this.rootRef, isWelcome: st.screen === "welcome", isWide: wide };
+    if (!S) return base;
+    const kind = st.kind, W = kind === "wholesale";
+    const goShop = (k) => this.setState({ kind: k, screen: "shop", q: "", cat: null, done: null, day: null, pay: null });
+    const pricesOn = !W || st.signedIn;
+    const cart = st.cart[kind];
+    const money = S.money;
+    const items = S.products.map((p) => {
+      const t = S.totals(p.id), n = W ? t.back : t.front, lowAt = W ? 6 : 24;
+      const av = n <= 0 ? "out" : n < lowAt ? "low" : "in";
+      const opts = W ? [{ id: p.id + ":case", label: p.case_size > 1 ? "Case of " + p.case_size : "Each", price: p.wholesale, card: null }] : p.packs.map((k, i) => ({ id: p.id + ":" + i, label: k[0], price: k[1], card: k[2] }));
+      return { p, av, opts };
+    });
+    const optMap = new Map();
+    items.forEach((it) => it.opts.forEach((o) => optMap.set(o.id, { it, o })));
+    const cats = [...new Set(S.products.map((p) => p.category))];
+    const words = st.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const shown = items.filter(({ p, av }) => (!st.cat || (st.cat === "__in" ? av !== "out" : p.category === st.cat)) && words.every((w) => (p.name + " " + p.brand).toLowerCase().includes(w)));
+    const avInfo = { in: ["In stock", "tag tag-neutral"], low: ["Low", "tag tag-accent"], out: ["Out", "tag tag-outline"] };
+    const viewItems = shown.map(({ p, av, opts }) => ({
+      name: p.name, sub: [p.brand, p.category].join(" · "), avLabel: avInfo[av][0], tagClass: avInfo[av][1],
+      hasParty: W && pricesOn, partyT: money(p.party),
+      options: opts.map((o) => { const q = cart[o.id] || 0; return { label: o.label, priceT: pricesOn ? money(o.price) : "Sign in for price", cardT: o.card != null && o.card !== o.price ? money(o.card) + " card" : "", qty: q, inCart: q > 0, notInCart: q === 0, add: () => this.setQty(o.id, 1), inc: () => this.setQty(o.id, q + 1), dec: () => this.setQty(o.id, q - 1) }; }),
+    }));
+    const useCard = !W && st.pay === "Card";
+    const lines = Object.keys(cart).filter((id) => cart[id] > 0 && optMap.has(id)).map((id) => {
+      const { it, o } = optMap.get(id), q = cart[id], unitP = useCard && o.card != null ? o.card : o.price;
+      return { name: it.p.name, label: o.label, qty: q, amt: unitP * q, lineT: pricesOn ? money(unitP * q) : q + (W ? (q === 1 ? " case" : " cases") : ""), flag: it.av !== "in", flagText: it.av === "out" ? "Out right now" : "Running low", inc: () => this.setQty(id, q + 1), dec: () => this.setQty(id, q - 1) };
+    });
+    const count = lines.reduce((a, l) => a + l.qty, 0), total = lines.reduce((a, l) => a + l.amt, 0);
+    const unitWord = W ? (count === 1 ? "case" : "cases") : (count === 1 ? "item" : "items");
+    const now = new Date(), closed = now.getHours() >= 15;
+    const days = [0, 1, 2, 3, 4].map((k) => {
+      const d = new Date(now); d.setDate(d.getDate() + k);
+      const id = d.toDateString(), dis = k === 0 && closed, sel = st.day === id;
+      const label = k === 0 ? "Today" : k === 1 ? "Tomorrow" : d.toLocaleDateString("en-US", { weekday: "long" });
+      return { id, label, sub: dis ? "Closed after 3 PM" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), dis, op: dis ? 0.45 : 1, onClick: () => this.setState({ day: id }), bg: sel ? "var(--color-accent-100)" : "transparent", bd: sel ? "var(--color-accent)" : "var(--color-divider)" };
+    });
+    const dayObj = days.find((d) => d.id === st.day);
+    const pays = (W ? ["Cash", "Check", "Card", "Zelle", "Invoice"] : ["Cash", "Card"]).map((label) => { const sel = st.pay === label; return { label, onClick: () => this.setState({ pay: label }), bg: sel ? "var(--color-accent-100)" : "transparent", bd: sel ? "var(--color-accent)" : "var(--color-divider)" }; });
+    const needSignIn = W && !st.signedIn;
+    const missing = !lines.length ? "Add something to your order first." : needSignIn ? "Sign in to place a wholesale order." : !st.day ? "Pick a " + (W ? "delivery" : "pickup") + " day." : !st.pay ? "Pick how you'll pay." : "";
+    const place = () => {
+      if (missing) return;
+      const msg = `Order sent: ${count} ${unitWord} for ${W ? "delivery" : "pickup"} ${dayObj.label.toLowerCase() === "today" || dayObj.label === "Tomorrow" ? dayObj.label.toLowerCase() : "on " + dayObj.label}. We'll email you when it's confirmed.`;
+      this.setState((s) => ({ done: msg, screen: "shop", cart: Object.assign({}, s.cart, { [s.kind]: {} }), day: null, pay: null }));
+    };
+    const screen = st.screen === "shop" && !W && !st.age ? (st.under ? "under" : "age") : st.screen;
+    const catChip = (label, val) => { const on = st.cat === val; return { label, onClick: () => this.setState({ cat: on ? null : val }), bg: on ? "var(--color-accent)" : "transparent", fg: on ? "var(--color-bg)" : "var(--color-text)", bd: on ? "var(--color-accent)" : "var(--color-divider)" }; };
+    return Object.assign(base, {
+      isWelcome: screen === "welcome", notWelcome: screen !== "welcome", isAge: screen === "age", isUnder: screen === "under", isShop: screen === "shop", isCheckout: screen === "checkout",
+      kindTabs: [["wholesale", "Wholesale"], ["retail", "Retail"]].map(([k, label]) => ({ label, onClick: () => goShop(k), bar: kind === k ? "var(--color-accent)" : "transparent", fg: kind === k ? "var(--color-accent-800)" : "var(--color-neutral-700)" })),
+      showAccount: W && st.signedIn && screen !== "welcome", accountText: "Rosa's Market", showSignIn: W && !st.signedIn && screen !== "welcome", signIn: () => this.setState({ signedIn: true }),
+      goWelcome: () => this.setState({ screen: "welcome" }), goWholesale: () => goShop("wholesale"), goRetail: () => goShop("retail"),
+      ageYes: () => this.setState({ age: true }), ageNo: () => this.setState({ under: true }),
+      shopTitle: W ? "Wholesale ordering" : "Retail ordering",
+      shopLead: W ? (st.signedIn ? "Case prices for your account. Stock shows as In stock, Low or Out." : "Prices show once you sign in with an approved business account.") : "What's in the front fridges right now. You must be 21 or older to order; ID is checked at pickup or delivery.",
+      hasDone: !!st.done, done: st.done,
+      shopCols: wide ? "minmax(0,1fr) 330px" : "minmax(0,1fr)",
+      q: st.q, hasQ: !!st.q, onQ: (e) => this.setState({ q: e.target.value }), clearQ: () => this.setState({ q: "" }),
+      cats: [catChip("In stock only", "__in")].concat(cats.map((c) => catChip(c, c))),
+      items: viewItems, noneShown: viewItems.length === 0,
+      orderTitle: "Your order" + (count ? " · " + count + " " + unitWord : ""), cartEmpty: !lines.length, lines,
+      showTotal: !!lines.length && pricesOn, totalT: money(total), anyFlag: lines.some((l) => l.flag),
+      needSignIn, canCheckout: !!lines.length && !needSignIn,
+      goCheckout: () => this.setState({ screen: "checkout", done: null }), backToShop: () => this.setState({ screen: "shop" }),
+      showBar: !wide && screen === "shop" && !!lines.length, barText: "Check out · " + count + " " + unitWord + (pricesOn ? " · " + money(total) : ""),
+      dayTitle: W ? "Delivery day" : "Pickup day", days,
+      payTitle: W ? "How you'll pay" : "Pay at pickup", pays,
+      hasPayNote: !W, payNote: "Card prices are a little higher than cash. The total updates when you pick.",
+      cantPlace: !!missing, missing, place,
+    });
+  }
+}
+</script>
+</body>
+</html>

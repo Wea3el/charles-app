@@ -56,7 +56,7 @@ export function AddLocationForm() {
 
 export function LocationRow({ loc }: { loc: Loc }) {
   return (
-    <div className="flex flex-wrap items-end gap-3 border-b border-black/10 py-3 dark:border-white/15">
+    <div className="flex flex-wrap items-end gap-3 border-b border-(--color-divider) py-3">
       <ActionForm action={updateLocation} className="flex flex-1 flex-wrap items-end gap-3">
         {(pending) => (
           <>
@@ -83,7 +83,7 @@ export function LocationRow({ loc }: { loc: Loc }) {
         {(pending) => (
           <>
             <input type="hidden" name="id" value={loc.id} />
-            <Button variant="secondary" className="text-red-700" disabled={pending}>
+            <Button variant="danger" disabled={pending}>
               Delete
             </Button>
           </>

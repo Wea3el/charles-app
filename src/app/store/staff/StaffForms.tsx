@@ -34,7 +34,7 @@ export function AddStaffForm() {
               ))}
             </Select>
           </Field>
-          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+          <label className="flex min-h-11 items-center gap-2 text-sm sm:col-span-2">
             <input type="checkbox" name="can_edit_prices" /> Can change prices and products
           </label>
           <div className="sm:col-span-2">
@@ -48,7 +48,7 @@ export function AddStaffForm() {
 
 export function StaffRow({ person }: { person: Tables<"staff"> }) {
   return (
-    <ActionForm action={updateStaff} className="flex flex-wrap items-center gap-4 border-b border-black/10 py-3 dark:border-white/15">
+    <ActionForm action={updateStaff} className="flex flex-wrap items-center gap-4 border-b border-(--color-divider) py-3">
       {(pending) => (
         <>
           <input type="hidden" name="id" value={person.id} />
@@ -60,10 +60,10 @@ export function StaffRow({ person }: { person: Tables<"staff"> }) {
               </option>
             ))}
           </Select>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex min-h-11 items-center gap-2 text-sm">
             <input type="checkbox" name="can_edit_prices" defaultChecked={person.can_edit_prices} /> Prices
           </label>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex min-h-11 items-center gap-2 text-sm">
             <input type="checkbox" name="active" defaultChecked={person.active} /> Active
           </label>
           <Button variant="secondary" disabled={pending}>

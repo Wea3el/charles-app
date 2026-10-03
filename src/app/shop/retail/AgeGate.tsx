@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { Button } from "@/components/ui";
+import { Button, Corners } from "@/components/ui";
 
 const KEY = "shop.age21";
 
@@ -20,13 +20,15 @@ export function AgeGate({ children }: { children: ReactNode }) {
 
   if (state === "checking") return null;
   if (state === "ok") return <>{children}</>;
-  if (state === "under") return <p className="text-lg">Sorry, you must be 21 or older to order.</p>;
+  if (state === "under") return <p className="!m-0 text-xl">Sorry, you must be 21 or older to order.</p>;
   return (
-    <div className="max-w-md space-y-4 rounded-xl border border-black/10 p-6 dark:border-white/15">
-      <h2 className="text-xl font-semibold">Are you 21 or older?</h2>
-      <p className="text-sm opacity-70">We check ID at pickup or delivery.</p>
-      <div className="flex gap-3">
+    <div className="blueprint flex max-w-[480px] flex-col gap-4 p-7">
+      <Corners />
+      <h2 className="!m-0 !text-[32px]">Are you 21 or older?</h2>
+      <p className="!m-0 text-(--color-neutral-700)">We check ID at pickup or delivery.</p>
+      <div className="grid grid-cols-2 gap-3">
         <Button
+          className="min-h-14 !text-lg"
           onClick={() => {
             try {
               localStorage.setItem(KEY, "yes");
@@ -36,7 +38,7 @@ export function AgeGate({ children }: { children: ReactNode }) {
         >
           Yes, I&apos;m 21+
         </Button>
-        <Button variant="secondary" onClick={() => setState("under")}>
+        <Button variant="secondary" className="min-h-14 !text-lg" onClick={() => setState("under")}>
           No
         </Button>
       </div>

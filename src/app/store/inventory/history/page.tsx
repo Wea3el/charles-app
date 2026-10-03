@@ -1,5 +1,4 @@
-import { PageShell } from "@/components/Tile";
-import { Badge } from "@/components/ui";
+import { PageShell } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,44 +29,30 @@ export default async function HistoryPage() {
     n === null ? "" : `${n} ${catalog === "retail" ? "single" : "case"}${n === 1 ? "" : "s"}`;
 
   return (
-    <PageShell title="Stock history" lead="The last 200 changes, newest first.">
-      {error && <p className="text-red-700">{error.message}</p>}
-      {moves && moves.length === 0 && <p className="opacity-70">No stock changes yet.</p>}
+    <PageShell lead="The last 200 changes, newest first.">
+      {error && <p className="!m-0 font-semibold text-(--color-accent-900)">{error.message}</p>}
+      {moves && moves.length === 0 && <p className="!m-0 text-(--color-neutral-700)">No stock changes yet.</p>}
       {moves && moves.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-black/10 dark:border-white/15">
-              <tr>
-                <th className="py-2 pr-3">When</th>
-                <th className="py-2 pr-3">What</th>
-                <th className="py-2 pr-3">Product</th>
-                <th className="py-2 pr-3">Details</th>
-                <th className="py-2 pr-3">Who</th>
-              </tr>
-            </thead>
-            <tbody>
-              {moves.map((m) => {
-                let details = "";
-                if (m.kind === "receive") details = `+${u(m.to?.catalog, m.quantity_in)} into ${m.to?.name}`;
-                else if (m.kind === "count") details = `${m.to?.name}: ${u(m.to?.catalog, m.quantity_out)} → ${u(m.to?.catalog, m.quantity_in)}`;
-                else details = `${u(m.from?.catalog, m.quantity_out)} from ${m.from?.name} → ${u(m.to?.catalog, m.quantity_in)} into ${m.to?.name}`;
-                return (
-                  <tr key={m.id} className="border-b border-black/5 align-top dark:border-white/10">
-                    <td className="whitespace-nowrap py-2 pr-3 opacity-70">{fmt.format(new Date(m.created_at))}</td>
-                    <td className="py-2 pr-3">
-                      <Badge>{KIND[m.kind] ?? m.kind}</Badge>
-                    </td>
-                    <td className="py-2 pr-3 font-medium">{m.products?.name}</td>
-                    <td className="py-2 pr-3">
-                      {details}
-                      {m.note && <div className="text-xs opacity-60">{m.note}</div>}
-                    </td>
-                    <td className="py-2 pr-3">{m.staff?.full_name}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex flex-col">
+          {moves.map((m) => {
+            let details = "";
+            if (m.kind === "receive") details = `+${u(m.to?.catalog, m.quantity_in)} into ${m.to?.name}`;
+            else if (m.kind === "count") details = `${m.to?.name}: ${u(m.to?.catalog, m.quantity_out)} → ${u(m.to?.catalog, m.quantity_in)}`;
+            else details = `${u(m.from?.catalog, m.quantity_out)} from ${m.from?.name} → ${u(m.to?.catalog, m.quantity_in)} into ${m.to?.name}`;
+            return (
+              <div key={m.id} className="flex flex-wrap gap-x-4 gap-y-1 border-b border-(--color-divider) py-3.5">
+                <span className="w-[130px] text-[13px] text-(--color-neutral-700)">{fmt.format(new Date(m.created_at))}</span>
+                <span className="min-w-[200px] flex-1">
+                  <strong className="font-semibold">{KIND[m.kind] ?? m.kind}</strong> {m.products?.name}
+                  <span className="block text-[13px] text-(--color-neutral-700)">
+                    {details}
+                    {m.note && ` · ${m.note}`}
+                  </span>
+                </span>
+                <span className="text-[13px]">{m.staff?.full_name}</span>
+              </div>
+            );
+          })}
         </div>
       )}
     </PageShell>

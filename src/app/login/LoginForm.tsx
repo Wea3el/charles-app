@@ -6,7 +6,7 @@ import { signIn } from "./actions";
 
 export function LoginForm({ next }: { next?: string }) {
   return (
-    <ActionForm action={signIn} className="space-y-4">
+    <ActionForm action={signIn} className="flex flex-col gap-4">
       {(pending) => (
         <>
           <input type="hidden" name="next" value={next ?? ""} />
@@ -17,7 +17,7 @@ export function LoginForm({ next }: { next?: string }) {
             <Input name="password" type="password" autoComplete="current-password" required />
           </Field>
           <details className="text-sm">
-            <summary className="cursor-pointer opacity-70">First time setting up the system?</summary>
+            <summary className="flex min-h-11 cursor-pointer items-center text-(--color-neutral-700)">First time setting up the system?</summary>
             <div className="mt-3">
               <Field label="Your name" hint="Only used for the very first login, which becomes the first manager.">
                 <Input name="full_name" autoComplete="name" />

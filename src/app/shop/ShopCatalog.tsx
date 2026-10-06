@@ -15,7 +15,18 @@ const AVAILABILITY: Record<Availability, { label: string; tag: string }> = {
 
 const SIGN_IN = "Sign in with an approved business account to see prices and order.";
 
-export function ShopCatalog({ kind, items, pricesVisible }: { kind: ShopKind; items: ShopItem[]; pricesVisible: boolean }) {
+/** `accountNote` replaces the sign-in prompt for a signed-in account that can't see prices yet. */
+export function ShopCatalog({
+  kind,
+  items,
+  pricesVisible,
+  accountNote,
+}: {
+  kind: ShopKind;
+  items: ShopItem[];
+  pricesVisible: boolean;
+  accountNote?: string;
+}) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -116,13 +127,15 @@ export function ShopCatalog({ kind, items, pricesVisible }: { kind: ShopKind; it
             </div>
           )}
           {cart.anyFlag && <p className="!m-0 text-[13px] text-(--color-neutral-700)">{FLAG_NOTE}</p>}
-          {needSignIn ? (
+          {needSignIn && accountNote ? (
+            <p className="!m-0 text-sm">{accountNote}</p>
+          ) : needSignIn ? (
             <>
               <p className="!m-0 text-sm">{SIGN_IN}</p>
-              <ButtonLink href={`/login?next=/shop/wholesale`}>Sign in</ButtonLink>
-              <Button variant="ghost" disabled title="Business accounts open soon">
+              <ButtonLink href="/shop/signin?kind=wholesale&next=/shop/wholesale">Sign in</ButtonLink>
+              <ButtonLink variant="ghost" href="/shop/signin?kind=wholesale#create">
                 Apply for a business account
-              </Button>
+              </ButtonLink>
             </>
           ) : (
             cart.lines.length > 0 && (

@@ -28,7 +28,9 @@ export type Database = {
         };
         Insert: Partial<Database["public"]["Tables"]["customers"]["Row"]> & { contact_name: string; kind: E["customer_kind"] };
         Update: Partial<Database["public"]["Tables"]["customers"]["Row"]>;
-        Relationships: [];
+        Relationships: [
+          { foreignKeyName: "customers_approved_by_fkey"; columns: ["approved_by"]; isOneToOne: false; referencedRelation: "staff"; referencedColumns: ["id"] },
+        ];
       };
       delivery_trips: {
         Row: {
@@ -53,24 +55,31 @@ export type Database = {
       };
       order_lines: {
         Row: {
-          confirmed_qty: number | null; id: string; order_id: string; pack_size_id: string | null;
-          product_id: string; requested_at: string; requested_qty: number; staff_note: string | null;
+          confirmed_qty: number | null; id: string; option_label: string | null; order_id: string;
+          pack_size_id: string | null; pack_units: number | null; product_id: string; product_name: string | null;
+          requested_at: string; requested_qty: number; staff_note: string | null;
           status: E["line_status"]; unit_price: number;
         };
         Insert: Partial<Database["public"]["Tables"]["order_lines"]["Row"]> & {
           order_id: string; product_id: string; requested_qty: number; unit_price: number;
         };
         Update: Partial<Database["public"]["Tables"]["order_lines"]["Row"]>;
-        Relationships: [];
+        Relationships: [
+          { foreignKeyName: "order_lines_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+        ];
       };
       orders: {
         Row: {
-          channel: E["order_channel"]; customer_id: string; customer_kind: E["customer_kind"];
-          delivered_at: string | null; delivery_status: E["delivery_status"];
+          cancel_reason: string | null; cancelled_at: string | null; channel: E["order_channel"];
+          client_id: string | null; confirmed_at: string | null; confirmed_by: string | null;
+          customer_id: string; customer_kind: E["customer_kind"];
+          delivered_at: string | null; delivery_status: E["delivery_status"]; discount_amount: number;
           discount_kind: E["discount_kind"] | null; discount_value: number | null; empties_count: number;
           empties_credit: number; entered_by_staff: string | null; fulfillment_date: string; has_ice: boolean;
-          id: string; notes: string | null; order_number: number; payment_status: E["payment_status"];
-          placed_at: string; status: E["order_status"]; stop_number: number | null; subtotal: number;
+          id: string; notes: string | null; order_number: number; payment_method: E["payment_method"] | null;
+          payment_status: E["payment_status"]; placed_at: string; price_mode: E["price_mode"] | null;
+          pay_online: boolean; card_fee_percent: number | null; card_fee: number; square_order_id: string | null;
+          square_payment_link_id: string | null; square_payment_link_url: string | null; square_payment_link_amount: number | null; status: E["order_status"]; stop_number: number | null; subtotal: number;
           total: number; trip_id: string | null; unpaid_signature_path: string | null;
           unpaid_signer_name: string | null;
         };
@@ -78,7 +87,10 @@ export type Database = {
           channel: E["order_channel"]; customer_id: string; customer_kind: E["customer_kind"]; fulfillment_date: string;
         };
         Update: Partial<Omit<Database["public"]["Tables"]["orders"]["Row"], "order_number">>;
-        Relationships: [];
+        Relationships: [
+          { foreignKeyName: "orders_customer_id_fkey"; columns: ["customer_id"]; isOneToOne: false; referencedRelation: "customers"; referencedColumns: ["id"] },
+          { foreignKeyName: "orders_confirmed_by_fkey"; columns: ["confirmed_by"]; isOneToOne: false; referencedRelation: "staff"; referencedColumns: ["id"] },
+        ];
       };
       pack_sizes: {
         Row: {
@@ -97,11 +109,14 @@ export type Database = {
       payments: {
         Row: {
           amount: number; id: string; method: E["payment_method"]; order_id: string; received_at: string;
-          received_by: string | null; reference: string | null;
+          received_by: string | null; reference: string | null; square_payment_id: string | null; square_refund_id: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["payments"]["Row"]> & { amount: number; method: E["payment_method"]; order_id: string };
         Update: Partial<Database["public"]["Tables"]["payments"]["Row"]>;
-        Relationships: [];
+        Relationships: [
+          { foreignKeyName: "payments_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+          { foreignKeyName: "payments_received_by_fkey"; columns: ["received_by"]; isOneToOne: false; referencedRelation: "staff"; referencedColumns: ["id"] },
+        ];
       };
       product_barcodes: {
         Row: { barcode: string; is_case: boolean; product_id: string };
@@ -161,7 +176,7 @@ export type Database = {
       };
       settings: {
         Row: {
-          card_markup_percent: number | null; empty_credit_rate: number; id: boolean; same_day_cutoff: string;
+          card_markup_percent: number | null; empty_credit_rate: number; id: boolean; order_days_ahead: number; same_day_cutoff: string;
           store_address: string | null; store_latitude: number | null; store_longitude: number | null; timezone: string;
         };
         Insert: Partial<Database["public"]["Tables"]["settings"]["Row"]>;
@@ -246,6 +261,24 @@ export type Database = {
       inv_receive: { Args: { p_location: string; p_note?: string; p_product: string; p_qty: number }; Returns: undefined };
       inv_restock: { Args: { p_cases: number; p_from: string; p_note?: string; p_product: string; p_to: string }; Returns: number };
       record_sale: { Args: { p_sale: Json }; Returns: string };
+      place_order: { Args: { p_order: Json }; Returns: Json };
+      place_guest_order: { Args: { p_guest: Json; p_order: Json }; Returns: Json };
+      confirm_order: { Args: { p_lines: Json; p_order: string }; Returns: E["order_status"] };
+      cancel_order: { Args: { p_order: string; p_reason: string }; Returns: undefined };
+      complete_order: { Args: { p_order: string }; Returns: undefined };
+      record_order_payment: {
+        Args: { p_amount: number; p_method: E["payment_method"]; p_order: string; p_reference?: string };
+        Returns: E["payment_status"];
+      };
+      shop_settings: {
+        Args: never;
+        Returns: { card_fee_percent: number; order_days_ahead: number; same_day_cutoff: string; timezone: string }[];
+      };
+      record_online_payment: { Args: { p_amount: number; p_order: string; p_square_payment_id: string }; Returns: E["payment_status"] };
+      record_order_refund: {
+        Args: { p_amount: number; p_order: string; p_reason: string; p_square_refund_id: string };
+        Returns: E["payment_status"];
+      };
       void_sale: { Args: { p_reason: string; p_sale: string }; Returns: undefined };
       shop_catalog: {
         Args: { p_kind: E["customer_kind"] };
@@ -269,7 +302,7 @@ export type Database = {
       discount_kind: "percent" | "flat";
       line_status: "pending" | "confirmed" | "partial" | "declined";
       location_kind: "commercial_fridge" | "industrial_fridge" | "warehouse_area";
-      movement_kind: "receive" | "restock" | "move" | "sale" | "order_pick" | "adjust" | "count" | "sale_void";
+      movement_kind: "receive" | "restock" | "move" | "sale" | "order_pick" | "adjust" | "count" | "sale_void" | "order_cancel";
       order_channel: "online" | "in_store" | "phone";
       order_status: "submitted" | "confirmed" | "partially_confirmed" | "cancelled" | "completed";
       payment_method: "cash" | "check" | "card" | "zelle" | "invoice";

@@ -27,7 +27,7 @@ export async function signIn(_prev: ActionResult, form: FormData): Promise<Actio
 
   if (!staff || !staff.active) {
     await supabase.auth.signOut();
-    return fail("This login isn't set up as staff. Ask a manager to add you.");
+    return fail("This login isn't set up as staff. Ask a manager to add you. Customers sign in on the ordering website.");
   }
 
   redirect(next && (next.startsWith("/store") || next.startsWith("/shop")) ? next : "/store");

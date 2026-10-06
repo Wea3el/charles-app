@@ -11,6 +11,8 @@ const TITLES: [string, string][] = [
   ["/store/inventory/locations", "Storage spots"],
   ["/store/inventory", "Find an item"],
   ["/store/low-stock", "Low stock"],
+  ["/store/orders", "Orders"],
+  ["/store/customers", "Customers"],
   ["/store/products", "Products"],
   ["/store/register", "Register"],
   ["/store/sales", "Sales"],

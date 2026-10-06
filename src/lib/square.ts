@@ -1,7 +1,10 @@
 /**
- * Square Terminal API (server only: uses the access token).
- * https://developer.squareup.com/reference/square/terminal-api
+ * Square APIs (server only: uses the access token).
+ * Terminal API for the register, Checkout API (payment links) for paying
+ * online, Refunds API for giving back what staff couldn't fill.
+ * https://developer.squareup.com/reference/square
  */
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 const SQUARE_VERSION = "2025-01-23";
 
@@ -16,14 +19,21 @@ export interface SquareCheckout {
 
 function config() {
   const token = process.env.SQUARE_ACCESS_TOKEN;
-  const deviceId = process.env.SQUARE_TERMINAL_DEVICE_ID;
-  if (!token || !deviceId) return null;
+  if (!token) return null;
   const base = process.env.SQUARE_ENVIRONMENT === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
-  return { token, deviceId, base };
+  return { token, base, deviceId: process.env.SQUARE_TERMINAL_DEVICE_ID, locationId: process.env.SQUARE_LOCATION_ID };
 }
 
+/** The register's card terminal is set up. */
 export function squareConfigured() {
-  return config() !== null;
+  const c = config();
+  return !!c?.deviceId;
+}
+
+/** Online payments are set up (also needs the service role key, to record them). */
+export function squareOnlineConfigured() {
+  const c = config();
+  return !!c?.locationId && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 }
 
 async function call<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
@@ -46,6 +56,10 @@ async function call<T>(path: string, init?: { method?: string; body?: unknown })
   }
   return json as T;
 }
+
+// ---------------------------------------------------------------------------
+// Terminal (register)
+// ---------------------------------------------------------------------------
 
 /** Send an amount to the terminal. idempotencyKey makes a retried request safe. */
 export async function createTerminalCheckout(idempotencyKey: string, amountCents: number, referenceId: string) {
@@ -75,4 +89,81 @@ export async function cancelTerminalCheckout(checkoutId: string) {
     { method: "POST" },
   );
   return checkout;
+}
+
+// ---------------------------------------------------------------------------
+// Online: hosted checkout page, payments, refunds
+// ---------------------------------------------------------------------------
+
+export interface PaymentLink {
+  id: string;
+  url: string;
+  order_id: string;
+}
+
+/** A Square-hosted checkout page for one amount. Card numbers never touch our site. */
+export async function createPaymentLink(p: {
+  idempotencyKey: string;
+  amountCents: number;
+  name: string;
+  note: string;
+  redirectUrl: string;
+  buyerEmail?: string | null;
+}) {
+  const c = config();
+  const { payment_link } = await call<{ payment_link: PaymentLink }>("/v2/online-checkout/payment-links", {
+    method: "POST",
+    body: {
+      idempotency_key: p.idempotencyKey,
+      quick_pay: { name: p.name, price_money: { amount: p.amountCents, currency: "USD" }, location_id: c?.locationId },
+      checkout_options: { redirect_url: p.redirectUrl, ask_for_shipping_address: false },
+      pre_populated_data: p.buyerEmail ? { buyer_email: p.buyerEmail } : undefined,
+      payment_note: p.note,
+    },
+  });
+  return payment_link;
+}
+
+export interface SquarePayment {
+  id: string;
+  status: "APPROVED" | "PENDING" | "COMPLETED" | "CANCELED" | "FAILED";
+  order_id?: string;
+  amount_money: { amount: number; currency: string };
+}
+
+/** The completed payment for a payment link's Square order, if the customer has paid. */
+export async function findCompletedPayment(squareOrderId: string): Promise<SquarePayment | null> {
+  const { order } = await call<{ order: { tenders?: { payment_id?: string }[] } }>(`/v2/orders/${encodeURIComponent(squareOrderId)}`);
+  for (const t of order.tenders ?? []) {
+    if (!t.payment_id) continue;
+    const { payment } = await call<{ payment: SquarePayment }>(`/v2/payments/${encodeURIComponent(t.payment_id)}`);
+    if (payment.status === "COMPLETED") return payment;
+  }
+  return null;
+}
+
+/** Give money back on a card payment. idempotencyKey makes a retried refund safe. */
+export async function refundPayment(p: { idempotencyKey: string; paymentId: string; amountCents: number; reason: string }) {
+  const { refund } = await call<{ refund: { id: string; status: string } }>("/v2/refunds", {
+    method: "POST",
+    body: {
+      idempotency_key: p.idempotencyKey,
+      payment_id: p.paymentId,
+      amount_money: { amount: p.amountCents, currency: "USD" },
+      reason: p.reason.slice(0, 192),
+    },
+  });
+  return refund;
+}
+
+/**
+ * Square signs each webhook: base64 HMAC-SHA256 of (notification URL + raw body),
+ * keyed with the subscription's signature key.
+ */
+export function verifyWebhookSignature(body: string, signature: string | null, notificationUrl: string, signatureKey: string): boolean {
+  if (!signature) return false;
+  const expected = createHmac("sha256", signatureKey).update(notificationUrl + body).digest("base64");
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature);
+  return a.length === b.length && timingSafeEqual(a, b);
 }

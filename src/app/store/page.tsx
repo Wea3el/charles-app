@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeftRight, ArrowUpFromLine, ClipboardCheck, History, PackagePlus, Receipt, ScanBarcode, Search, Tag, TriangleAlert, Users } from "lucide-react";
+import { ArrowLeftRight, ArrowUpFromLine, ClipboardCheck, ClipboardList, Contact, History, PackagePlus, Receipt, ScanBarcode, Search, Tag, TriangleAlert, Users } from "lucide-react";
 import { BigTile, ButtonLink } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -15,7 +15,11 @@ const tasks = [
 export default async function StoreHome() {
   const staff = await requireStaff();
   const supabase = await createClient();
-  const { count } = await supabase.from("low_stock").select("product_id", { count: "exact", head: true });
+  const [{ count }, { count: newOrders }, { count: waiting }] = await Promise.all([
+    supabase.from("low_stock").select("product_id", { count: "exact", head: true }),
+    supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "submitted"),
+    supabase.from("customers").select("id", { count: "exact", head: true }).eq("status", "pending"),
+  ]);
 
   const more = [
     { href: "/store/products", icon: Tag, label: "Products and prices" },
@@ -47,6 +51,14 @@ export default async function StoreHome() {
           title="Low stock"
           body="Restock or reorder"
           badge={count ? `${count} item${count === 1 ? "" : "s"}` : undefined}
+        />
+        <BigTile href="/store/orders" icon={ClipboardList} title="Orders" body="Confirm and hand over" badge={newOrders ? `${newOrders} new` : undefined} />
+        <BigTile
+          href="/store/customers"
+          icon={Contact}
+          title="Customers"
+          body="Approve business accounts"
+          badge={waiting ? `${waiting} waiting` : undefined}
         />
       </div>
       <div className="flex flex-wrap gap-2.5">

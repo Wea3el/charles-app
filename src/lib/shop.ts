@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { toCents } from "@/lib/register";
+import { DEFAULT_SHOP_SETTINGS, type ShopSettings } from "@/lib/orders";
 
 export type ShopKind = "wholesale" | "retail";
 export type Availability = "in_stock" | "low" | "out";
@@ -54,4 +55,14 @@ export async function loadShopCatalog(kind: ShopKind): Promise<{ items: ShopItem
           })),
   }));
   return { items, pricesVisible: kind === "retail" || rows.some((r) => r.prices_visible) };
+}
+
+/** Same-day cutoff, days ahead and time zone (the settings table itself is staff-only). */
+export async function loadShopSettings(): Promise<ShopSettings> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("shop_settings");
+  const s = data?.[0];
+  return s
+    ? { sameDayCutoff: s.same_day_cutoff, daysAhead: s.order_days_ahead, timeZone: s.timezone, cardFeePercent: Number(s.card_fee_percent) }
+    : DEFAULT_SHOP_SETTINGS;
 }

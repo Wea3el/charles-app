@@ -45,9 +45,17 @@ export function useCart(kind: ShopKind, items: ShopItem[], cardPrices = false) {
   const count = lines.reduce((n, l) => n + l.quantity, 0);
   const unit = kind === "wholesale" ? "case" : "item";
 
+  const clear = () => {
+    setCart({});
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  };
+
   return {
     cart,
     setQty,
+    clear,
     lines,
     count,
     totalCents: lines.reduce((n, l) => n + l.totalCents, 0),

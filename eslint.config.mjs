@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // HTML design prototypes, not app code.
+    "design_handoff_store_ui/**",
   ]),
 ]);
 

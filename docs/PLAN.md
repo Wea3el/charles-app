@@ -45,7 +45,7 @@ The full living plan is the Claude Docs document "Store System Plan: Deliverable
 0. Decide and gather: pricing rules check, export old POS data, type up paper records, store layout, accounts.
 1. Catalog + inventory. **Built** (2026-09-26): see README "Status".
 2. Register (with offline mode and Square Terminal). **Built** (2026-09-28).
-3. Online ordering (wholesale + retail).
+3. Online ordering (wholesale + retail). **Built** (2026-10-05).
 4. Delivery routes and driver view.
 
 ## Still open
@@ -54,9 +54,9 @@ The full living plan is the Claude Docs document "Store System Plan: Deliverable
 2. Name of the old POS, and can it export?
 3. Should discounts be limited to certain staff?
 4. Credit per empty, and does it vary by container?
-5. How many days ahead can customers order?
+5. How many days ahead can customers order? Set to 5 (today + 4) for now: `settings.order_days_ahead`.
 6. Payment terms for invoice customers; flag overdue balances?
-7. Retail online orders: pickup or delivery, pay online or in store, cash or card price?
+7. Retail online orders: pickup or delivery, pay online or in store, cash or card price? Built as: pickup only, pay at pickup, cash or card price picked at checkout.
 8. Sales tax: are shelf prices tax-included, and if not, what rate? The register does not add tax yet.
 9. Voids are managers only. Should cashiers be able to void their own sale for a few minutes?
 
@@ -73,3 +73,14 @@ The full living plan is the Claude Docs document "Store System Plan: Deliverable
 - Sales can't be edited or deleted. Managers void with a reason (`void_sale()`), which puts the singles back. Refund card payments in Square.
 - `terminal_checkouts` records every Square Terminal checkout so a paid card can always be matched to its sale.
 - Customers never read products or stock directly: the shop pages use `shop_catalog()`, which returns In stock / Low / Out and only shows wholesale prices to approved accounts and staff.
+
+## Phase 3 notes
+
+- Customers sign up on the website. A trigger on new logins makes the `customers` row from the sign-up form: retail is approved right away, wholesale is `pending` until staff approve it in Customers. Staff logins carry no sign-up data, so they never get one.
+- Orders are written only through `place_order()`. It checks the account (approved, right kind), the day (store time zone, same-day cutoff, `order_days_ahead`) and prices every line from the database. The browser's `client_id` makes a double-click or resend return the same order.
+- Stock is not held when an order is placed. Staff confirm each line with `confirm_order()` (full, part, or 0 to decline), first come first served; that is when stock comes out (fullest spot first) and it refuses to confirm more than is on hand. `cancel_order()` puts picked stock back.
+- Order lines keep a snapshot of the product name, option label and price, so orders read the same after the catalog changes.
+- Retail customers can also check out as a guest through `place_guest_order()`. A guest is a retail `customers` row with no login, reused by email (latest name and phone kept). Guests get the same emails but have no "My orders" page. Signing up later with the same email starts a separate account; past guest orders are not moved over.
+- A business's standing discount (`customers.default_discount_*`) is copied onto each new order.
+- Emails go through Resend when `EMAIL_API_KEY` / `EMAIL_FROM` are set and are skipped otherwise.
+- Not built yet: uploading license / tax documents (staff check them in person for now), staff entering phone or in-store orders for a customer, customers changing or cancelling an order online (they call the store).

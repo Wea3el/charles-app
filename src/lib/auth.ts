@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/database.types";
@@ -21,6 +22,22 @@ export async function requireStaff(): Promise<Staff> {
   if (!staff) redirect("/login?reason=not-staff");
   return staff;
 }
+
+export type Customer = Tables<"customers">;
+
+/** Who is looking at the shop: a customer account, staff, or nobody. Once per request. */
+export const getShopViewer = cache(async (): Promise<{ customer: Customer | null; staff: Staff | null }> => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { customer: null, staff: null };
+  const [{ data: customer }, { data: staff }] = await Promise.all([
+    supabase.from("customers").select("*").eq("auth_user_id", user.id).maybeSingle(),
+    supabase.from("staff").select("*").eq("id", user.id).maybeSingle(),
+  ]);
+  return { customer: customer ?? null, staff: staff?.active ? staff : null };
+});
 
 export async function requireManager(): Promise<Staff> {
   const staff = await requireStaff();

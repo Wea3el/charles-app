@@ -42,7 +42,37 @@ docs/PLAN.md        plan summary and open questions
 1. In Supabase > Authentication > Users, click **Add user** and create your own login (email + password, auto-confirm).
 2. Sign in at `/login`. The very first person to sign in becomes the first manager (with price editing).
 3. Add everyone else from **Staff** in the store app (needs the service role key).
-4. Until the wholesale website is built, turn off **Allow new users to sign up** in Supabase > Authentication > Sign In / Providers, so nobody else can create an account.
+4. Customer accounts (Phase 3) need sign-ups on: in Supabase > Authentication > Sign In / Providers, turn on **Allow new users to sign up** and keep **Confirm email** on. Sign-ups only ever create customer accounts; staff logins are still made from **Staff**.
+5. In Supabase > Authentication > URL Configuration, set **Site URL** to the live site and add `https://<your-site>/auth/callback` (and `http://localhost:3000/auth/callback`) to **Redirect URLs**, so the confirm-email link signs customers in.
+6. For order emails, set `EMAIL_API_KEY` (a Resend API key) and `EMAIL_FROM` (an address on a domain verified in Resend). Without them nothing breaks; emails are just skipped and staff see a note to tell the customer.
+
+## Online payments (Square)
+
+Customers can pick **Pay now online** at checkout. They pay the estimated total on Square's secure checkout page (card, Apple Pay, Google Pay, Cash App Pay), so card numbers never touch this site. When staff confirm an order short, the difference is refunded to the card automatically; cancelling refunds it all. Wholesale card payments add the card fee in `settings.card_markup_percent` (retail already pays card prices). The option only shows once Square is set up:
+
+1. In the [Square developer dashboard](https://developer.squareup.com/apps), create an application. Use the **Sandbox** tab while testing (test card `4111 1111 1111 1111`, any future date, any CVV, ZIP 94103).
+2. Set `SQUARE_ENVIRONMENT` (`sandbox` or `production`), `SQUARE_ACCESS_TOKEN` and `SQUARE_LOCATION_ID` (Locations page) in `.env.development.local` / Vercel.
+3. Set `SUPABASE_SERVICE_ROLE_KEY` (Supabase > Project Settings > API keys, the secret key). Payments are recorded with it, server side only.
+4. Webhooks > Subscriptions: add `https://<your-site>/api/square/webhook` for `payment.updated`, and put its signature key in `SQUARE_WEBHOOK_SIGNATURE_KEY`. This marks orders paid even if the customer closes the tab before coming back. (A webhook can't reach `localhost`; locally the return page checks with Square instead.)
+5. Set the wholesale card fee: `update settings set card_markup_percent = 3;` (check your state's rules on card surcharges first).
+
+## Dev database (for testing)
+
+There are two Supabase projects: production (`tinlylwpinfojvbqqcyp`) and **charles-app-dev** (`aihuxpwljkwiasyheeqg`), which has the same schema plus test data. `npm run dev` uses the dev one through `.env.development.local` (not committed; it overrides `.env.local`). Ask for the values or copy them from Supabase > charles-app-dev > Project Settings > API. Delete that file to point the dev server at production again.
+
+Test logins on the dev project (password `charles-test-123`; all of them are also in `docs/test-accounts.csv`):
+
+| Login | Where | What it is |
+| --- | --- | --- |
+| `dev@example.com` | `/login` | Developer account: store app manager with price editing |
+| `staff@example.com` | `/login` | Store app manager |
+| `wholesale@example.com` | `/shop/signin` | Approved business, 10% standing discount |
+| `retail@example.com` | `/shop/signin` | Retail customer |
+| `luckys@example.com` | `/shop/signin` | Lucky's Liquor Mart, approved |
+| `harbor@example.com` | `/shop/signin` | Harbor Tavern, approved, 5% discount |
+| `sunset@example.com` | `/shop/signin` | Sunset Lounge, waiting for approval |
+
+The test catalog has items in stock, low (Modelo in the warehouse, Bud Light up front) and out (White Claw), so partial fills and declines can be tried. `supabase/seed_dev_activity.sql` adds the fuller catalog (beer, seltzer, kegs, wine, liquor, mixers), two weeks of register sales and orders in every state. To top the test data back up, re-run `supabase/seed_dev.sql` then `supabase/seed_dev_activity.sql` in the dev project's SQL editor (it skips what already exists). New migrations go to **both** projects.
 
 ## Deploying
 
@@ -65,6 +95,14 @@ Phase 2 (register) is built:
 - Works offline: every sale is saved on the laptop first and synced when the connection is back; the page reloads offline after one online visit (production build only)
 - Sales at `/store/sales`: daily totals by cash and card, every sale with its items, voids (managers; stock goes back)
 
-Shop previews (Phase 3 groundwork): `/shop/wholesale` and `/shop/retail` show the live catalog with In stock / Low / Out and a cart. Retail asks for 21+. Wholesale prices only show to approved business accounts and staff. Placing orders and customer sign-up come in Phase 3.
+Phase 3 (online ordering) is built:
 
-Next: Phase 3 (online ordering). See docs/PLAN.md.
+- Customer accounts at `/shop/signin`: businesses apply with liquor license and tax ID and wait for approval; retail customers (21+) can order right away
+- Retail guest checkout: name, phone, email and a 21+ check, no account needed (wholesale always needs an approved account)
+- Checkout places real orders: pick a day (today closes at the same-day cutoff, up to 5 days ahead), pick how you'll pay; prices always come from the database
+- `/shop/account`: the customer's orders, what was confirmed, short or declined, and the total
+- Store app **Orders** (`/store/orders`): new orders first come, first served; confirm each line in full, part, or decline (stock comes out then); take payments; mark delivered / picked up; cancel (stock goes back)
+- Store app **Customers** (`/store/customers`): approve, reject or suspend accounts; standing discount per business
+- Emails (Resend): order received, order confirmed / short / cancelled, business account approved
+
+Next: Phase 4 (delivery routes and driver view). See docs/PLAN.md.

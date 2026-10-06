@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Keeps the Supabase login session fresh and sends signed-out visitors
+// Keeps the Supabase login session fresh (staff and customers) and sends signed-out visitors
 // of the store app to the login page.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -40,5 +40,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/store/:path*", "/login"],
+  matcher: ["/store/:path*", "/login", "/shop/:path*", "/"],
 };

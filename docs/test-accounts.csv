@@ -1,0 +1,9 @@
+email,password,type,sign_in_at,database,notes
+dev@example.com,charles-test-123,staff (manager),/login,dev (charles-app-dev),Developer account: full store app access including prices and staff
+staff@example.com,charles-test-123,staff (manager),/login,dev (charles-app-dev),Sam Staff: confirm orders and run the register
+wholesale@example.com,charles-test-123,wholesale customer,/shop/signin,dev (charles-app-dev),Test Bar & Grill: approved; 10% standing discount
+luckys@example.com,charles-test-123,wholesale customer,/shop/signin,dev (charles-app-dev),Lucky's Liquor Mart: approved
+harbor@example.com,charles-test-123,wholesale customer,/shop/signin,dev (charles-app-dev),Harbor Tavern: approved; 5% standing discount
+sunset@example.com,charles-test-123,wholesale customer,/shop/signin,dev (charles-app-dev),Sunset Lounge: waiting for approval (can see the shop but not prices)
+retail@example.com,charles-test-123,retail customer,/shop/signin,dev (charles-app-dev),Ray Retail
+gina.guest@example.com,(none),retail guest,(no login),dev (charles-app-dev),Guest checkout record; has no password
